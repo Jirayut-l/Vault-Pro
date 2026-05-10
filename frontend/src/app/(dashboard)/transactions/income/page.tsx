@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { calculateDistribution } from "@/lib/financial-logic";
+import { AxiosError } from "axios";
 
 const formSchema = z.object({
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -42,8 +42,12 @@ export default function IncomePage() {
     },
   });
 
-  const amount = form.watch("amount");
-  const distributions = calculateDistribution(amount);
+  const amount = useWatch({
+    control: form.control,
+    name: "amount",
+  });
+  
+  const distributions = calculateDistribution(amount || "");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -59,8 +63,9 @@ export default function IncomePage() {
         router.push("/");
         router.refresh();
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to add income");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ error: string }>;
+      toast.error(axiosError.response?.data?.error || "Failed to add income");
     } finally {
       setLoading(false);
     }

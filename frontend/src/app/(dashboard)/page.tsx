@@ -18,8 +18,13 @@ import {
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface DashboardSummary {
+  total_balance: string;
+  jars: Record<string, string>;
+}
+
 export default function DashboardPage() {
-  const [summary, setSummary] = useState<any>(null);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +44,7 @@ export default function DashboardPage() {
     fetchSummary();
   }, []);
 
-  const jarColors: any = {
+  const jarColors: Record<string, string> = {
     NEC: "#10b981", // Emerald-500
     FFA: "#3b82f6", // Blue-500
     LTS: "#8b5cf6", // Violet-500
@@ -76,7 +81,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-50">
-              ฿{parseFloat(summary?.total_balance || 0).toLocaleString()}
+              ฿{parseFloat(summary?.total_balance || "0").toLocaleString()}
             </div>
             <p className="text-xs text-emerald-500 flex items-center gap-1 mt-1">
               <TrendingUp className="h-3 w-3" /> +2.5% from last month

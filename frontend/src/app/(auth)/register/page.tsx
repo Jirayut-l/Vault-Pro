@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -54,8 +54,9 @@ export default function RegisterPage() {
         toast.success("Account created successfully! Please login.");
         router.push("/login");
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Registration failed");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ error: string }>;
+      toast.error(axiosError.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }

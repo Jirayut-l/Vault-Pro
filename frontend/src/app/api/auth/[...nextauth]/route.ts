@@ -11,8 +11,9 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
         try {
-          const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+          const res = await axios.post(`${apiUrl}/auth/login`, {
             email: credentials?.email,
             password: credentials?.password,
           });
@@ -26,7 +27,7 @@ const handler = NextAuth({
             };
           }
           return null;
-        } catch (error) {
+        } catch {
           return null;
         }
       },

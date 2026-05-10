@@ -1,7 +1,13 @@
 # Stage 1: Build the Go binary
-FROM golang:1.22-alpine AS builder
+FROM golang:alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git gcc musl-dev
 
 WORKDIR /app
+
+# Set Go Proxy for better reliability
+ENV GOPROXY=https://proxy.golang.org,direct
 
 # Copy go mod and sum files
 COPY go.mod go.sum ./
@@ -11,12 +17,13 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/api/main.go
+# Using -ldflags="-s -w" to reduce binary size
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./cmd/api/main.go
 
 # Stage 2: Final minimal image
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /root/
 

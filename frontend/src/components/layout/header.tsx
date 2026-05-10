@@ -31,16 +31,18 @@ export function DashboardHeader() {
         </button>
         
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full border border-slate-800 p-1 hover:bg-slate-900">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt={session?.user?.email || "User"} />
-                <AvatarFallback className="bg-emerald-600 text-xs text-white">
-                  {session?.user?.email?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger
+            render={
+              <button className="flex items-center gap-2 rounded-full border border-slate-800 p-1 hover:bg-slate-900">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="" alt={session?.user?.email || "User"} />
+                  <AvatarFallback className="bg-emerald-600 text-xs text-white">
+                    {session?.user?.email?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            }
+          />
           <DropdownMenuContent align="end" className="w-56 border-slate-800 bg-slate-900 text-slate-50">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-800" />

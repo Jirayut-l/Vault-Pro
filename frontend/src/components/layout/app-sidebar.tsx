@@ -6,7 +6,6 @@ import {
   Receipt,
   Wallet,
   TrendingUp,
-  Settings,
   PlusCircle,
   ArrowRightLeft,
   MinusCircle,
@@ -93,15 +92,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    asChild
+                    render={<Link href={item.url} />}
                     isActive={pathname === item.url}
                     tooltip={item.title}
                     className="hover:bg-slate-900"
                   >
-                    <Link href={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -115,14 +112,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {actionItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    asChild
+                    render={<Link href={item.url} />}
                     tooltip={item.title}
                     className="hover:bg-slate-900"
                   >
-                    <Link href={item.url}>
-                      <item.icon className={`h-4 w-4 ${item.color}`} />
-                      <span>{item.title}</span>
-                    </Link>
+                    <item.icon className={`h-4 w-4 ${item.color}`} />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

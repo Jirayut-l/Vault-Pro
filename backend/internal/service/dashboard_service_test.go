@@ -6,12 +6,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
+	"github.com/vault-pro/backend/internal/mocks"
 	"github.com/vault-pro/backend/internal/model"
 )
 
 func TestGetSummary_Success(t *testing.T) {
-	mockAccountRepo := new(MockAccountRepository)
-	mockTxRepo := new(MockTransactionRepository)
+	mockAccountRepo := new(mocks.MockAccountRepository)
+	mockTxRepo := new(mocks.MockTransactionRepository)
 	dashboardService := NewDashboardService(mockAccountRepo, mockTxRepo)
 
 	userID := uuid.New()
@@ -35,8 +36,8 @@ func TestGetSummary_Success(t *testing.T) {
 }
 
 func TestGetExpensesByCategory_Success(t *testing.T) {
-	mockAccountRepo := new(MockAccountRepository)
-	mockTxRepo := new(MockTransactionRepository)
+	mockAccountRepo := new(mocks.MockAccountRepository)
+	mockTxRepo := new(mocks.MockTransactionRepository)
 	dashboardService := NewDashboardService(mockAccountRepo, mockTxRepo)
 
 	userID := uuid.New()

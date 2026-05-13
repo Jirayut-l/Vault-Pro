@@ -12,31 +12,13 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/vault-pro/backend/internal/mocks"
+	"github.com/vault-pro/backend/internal/model"
 )
 
-// MockTransactionService is a mock of the TransactionService interface
-type MockTransactionService struct {
-	mock.Mock
-}
-
-func (m *MockTransactionService) AddIncome(userID uuid.UUID, amount decimal.Decimal, category, note string) error {
-	args := m.Called(userID, amount, category, note)
-	return args.Error(0)
-}
-
-func (m *MockTransactionService) AddExpense(userID uuid.UUID, accountID uuid.UUID, amount decimal.Decimal, category, note string) error {
-	args := m.Called(userID, accountID, amount, category, note)
-	return args.Error(0)
-}
-
-func (m *MockTransactionService) Transfer(userID uuid.UUID, fromAccountID, toAccountID uuid.UUID, amount decimal.Decimal, note string) error {
-	args := m.Called(userID, fromAccountID, toAccountID, amount, note)
-	return args.Error(0)
-}
-
-func TestTransactionHandler_AddIncome_Success(t *testing.T) {
+func TestTransactionHandler_Create_Income_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	mockService := new(MockTransactionService)
+	mockService := new(mocks.MockTransactionService)
 	handler := NewTransactionHandler(mockService)
 	
 	r := gin.Default()
@@ -47,22 +29,22 @@ func TestTransactionHandler_AddIncome_Success(t *testing.T) {
 		c.Next()
 	})
 	
-	r.POST("/income", handler.AddIncome)
+	r.POST("/transactions", handler.Create)
 
 	amount := decimal.NewFromFloat(1000.00)
-	// Use mock.MatchedBy for decimal comparison
 	mockService.On("AddIncome", userID, mock.MatchedBy(func(d decimal.Decimal) bool {
 		return d.Equal(amount)
 	}), "Salary", "Bonus").Return(nil)
 
-	body := IncomeRequest{
+	body := CreateTransactionRequest{
 		Amount:   amount,
+		Type:     model.Income,
 		Category: "Salary",
 		Note:     "Bonus",
 	}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest("POST", "/income", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest("POST", "/transactions", bytes.NewBuffer(jsonBody))
 	w := httptest.NewRecorder()
 	
 	r.ServeHTTP(w, req)
@@ -71,9 +53,9 @@ func TestTransactionHandler_AddIncome_Success(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestTransactionHandler_AddExpense_Success(t *testing.T) {
+func TestTransactionHandler_Create_Expense_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	mockService := new(MockTransactionService)
+	mockService := new(mocks.MockTransactionService)
 	handler := NewTransactionHandler(mockService)
 	
 	r := gin.Default()
@@ -83,7 +65,7 @@ func TestTransactionHandler_AddExpense_Success(t *testing.T) {
 		c.Next()
 	})
 	
-	r.POST("/expense", handler.AddExpense)
+	r.POST("/transactions", handler.Create)
 
 	accID := uuid.New()
 	amount := decimal.NewFromFloat(50.00)
@@ -91,19 +73,48 @@ func TestTransactionHandler_AddExpense_Success(t *testing.T) {
 		return d.Equal(amount)
 	}), "Food", "Lunch").Return(nil)
 
-	body := ExpenseRequest{
+	body := CreateTransactionRequest{
 		AccountID: accID,
 		Amount:    amount,
+		Type:      model.Expense,
 		Category:  "Food",
 		Note:      "Lunch",
 	}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest("POST", "/expense", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest("POST", "/transactions", bytes.NewBuffer(jsonBody))
 	w := httptest.NewRecorder()
 	
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
+	mockService.AssertExpectations(t)
+}
+
+func TestTransactionHandler_GetAll_Success(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockService := new(mocks.MockTransactionService)
+	handler := NewTransactionHandler(mockService)
+	
+	r := gin.Default()
+	userID := uuid.New()
+	r.Use(func(c *gin.Context) {
+		c.Set("userID", userID)
+		c.Next()
+	})
+	
+	r.GET("/transactions", handler.GetAll)
+
+	mockTxs := []model.Transaction{
+		{ID: uuid.New(), Amount: decimal.NewFromFloat(100.00)},
+	}
+	mockService.On("GetTransactions", userID, 5, 2026).Return(mockTxs, nil)
+
+	req, _ := http.NewRequest("GET", "/transactions?month=5&year=2026", nil)
+	w := httptest.NewRecorder()
+	
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
 	mockService.AssertExpectations(t)
 }

@@ -10,44 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/vault-pro/backend/internal/mocks"
 	"github.com/vault-pro/backend/internal/model"
 )
 
-// MockUserService is a mock of the UserService interface
-type MockUserService struct {
-	mock.Mock
-}
-
-func (m *MockUserService) Register(username, email, password string) (*model.User, error) {
-	args := m.Called(username, email, password)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.User), args.Error(1)
-}
-
-func (m *MockUserService) Login(email, password string) (string, string, error) {
-	args := m.Called(email, password)
-	return args.String(0), args.String(1), args.Error(2)
-}
-
-func (m *MockUserService) RefreshToken(tokenString string) (string, string, error) {
-	args := m.Called(tokenString)
-	return args.String(0), args.String(1), args.Error(2)
-}
-
-func (m *MockUserService) GetUserByID(id uuid.UUID) (*model.User, error) {
-	args := m.Called(id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.User), args.Error(1)
-}
-
 func TestAuthHandler_Register_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	mockService := new(MockUserService)
+	mockService := new(mocks.MockUserService)
 	handler := NewAuthHandler(mockService)
 	
 	r := gin.Default()
@@ -78,7 +47,7 @@ func TestAuthHandler_Register_Success(t *testing.T) {
 
 func TestAuthHandler_Login_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	mockService := new(MockUserService)
+	mockService := new(mocks.MockUserService)
 	handler := NewAuthHandler(mockService)
 	
 	r := gin.Default()

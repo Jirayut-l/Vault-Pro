@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -28,51 +27,45 @@ func TestPasswordHashing(t *testing.T) {
 }
 
 func TestJWTTokenManagement(t *testing.T) {
-	// Set dummy secret and expirations for test
-	os.Setenv("JWT_SECRET", "test_secret_key_123")
-	os.Setenv("JWT_ACCESS_EXPIRATION", "1m")
-	os.Setenv("JWT_REFRESH_EXPIRATION", "10m")
-	
-	// Update local jwtSecret variable from env
-	jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+	tm, err := NewTokenManager("test_secret_key_123", "1m", "10m")
+	assert.NoError(t, err)
 
 	userID := uuid.New()
 
 	// Test Access Token Generation & Validation
-	accessToken, err := GenerateAccessToken(userID)
+	accessToken, err := tm.GenerateAccessToken(userID)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, accessToken)
 
-	claims, err := ValidateToken(accessToken)
+	claims, err := tm.ValidateToken(accessToken)
 	assert.NoError(t, err)
 	assert.Equal(t, userID, claims.UserID)
 
 	// Test Refresh Token Generation & Validation
-	refreshToken, err := GenerateRefreshToken(userID)
+	refreshToken, err := tm.GenerateRefreshToken(userID)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, refreshToken)
 
-	claims, err = ValidateToken(refreshToken)
+	claims, err = tm.ValidateToken(refreshToken)
 	assert.NoError(t, err)
 	assert.Equal(t, userID, claims.UserID)
 
 	// Test Invalid Token
-	_, err = ValidateToken("invalid.token.string")
+	_, err = tm.ValidateToken("invalid.token.string")
 	assert.Error(t, err)
 }
 
 func TestTokenExpiration(t *testing.T) {
-	os.Setenv("JWT_SECRET", "test_secret_key_123")
-	os.Setenv("JWT_ACCESS_EXPIRATION", "1ms") // Very short expiration
-	jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+	tm, err := NewTokenManager("test_secret_key_123", "1ms", "10m")
+	assert.NoError(t, err)
 
 	userID := uuid.New()
-	token, err := GenerateAccessToken(userID)
+	token, err := tm.GenerateAccessToken(userID)
 	assert.NoError(t, err)
 
 	// Wait for expiration
 	time.Sleep(10 * time.Millisecond)
 
-	_, err = ValidateToken(token)
+	_, err = tm.ValidateToken(token)
 	assert.Error(t, err, "Token should be expired")
 }

@@ -6,39 +6,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/vault-pro/backend/internal/mocks"
 	"github.com/vault-pro/backend/internal/model"
 	"github.com/vault-pro/backend/pkg/utils"
 )
 
-// MockUserRepository is a mock of the UserRepository interface
-type MockUserRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserRepository) Create(user *model.User) error {
-	args := m.Called(user)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindByEmail(email string) (*model.User, error) {
-	args := m.Called(email)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.User), args.Error(1)
-}
-
-func (m *MockUserRepository) FindByID(id uuid.UUID) (*model.User, error) {
-	args := m.Called(id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.User), args.Error(1)
-}
-
 func TestRegister_Success(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	userService := NewUserService(mockRepo)
+	mockRepo := new(mocks.MockUserRepository)
+	tm, _ := utils.NewTokenManager("test_secret", "15m", "168h")
+	userService := NewUserService(mockRepo, tm)
 
 	username := "testuser"
 	email := "test@example.com"
@@ -58,8 +34,9 @@ func TestRegister_Success(t *testing.T) {
 }
 
 func TestLogin_Success(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	userService := NewUserService(mockRepo)
+	mockRepo := new(mocks.MockUserRepository)
+	tm, _ := utils.NewTokenManager("test_secret", "15m", "168h")
+	userService := NewUserService(mockRepo, tm)
 
 	email := "test@example.com"
 	password := "password123"
@@ -84,8 +61,9 @@ func TestLogin_Success(t *testing.T) {
 }
 
 func TestLogin_Failure_WrongPassword(t *testing.T) {
-	mockRepo := new(MockUserRepository)
-	userService := NewUserService(mockRepo)
+	mockRepo := new(mocks.MockUserRepository)
+	tm, _ := utils.NewTokenManager("test_secret", "15m", "168h")
+	userService := NewUserService(mockRepo, tm)
 
 	email := "test@example.com"
 	password := "correct_password"

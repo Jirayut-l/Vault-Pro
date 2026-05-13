@@ -14,6 +14,9 @@ type TransactionService interface {
 	AddIncome(userID uuid.UUID, amount decimal.Decimal, category, note string) error
 	AddExpense(userID uuid.UUID, accountID uuid.UUID, amount decimal.Decimal, category, note string) error
 	Transfer(userID uuid.UUID, fromAccountID, toAccountID uuid.UUID, amount decimal.Decimal, note string) error
+	GetTransactions(userID uuid.UUID, month, year int) ([]model.Transaction, error)
+	UpdateTransaction(userID uuid.UUID, txID uuid.UUID, amount decimal.Decimal, category, note string) error
+	DeleteTransaction(userID uuid.UUID, txID uuid.UUID) error
 }
 
 type transactionService struct {
@@ -142,5 +145,103 @@ func (s *transactionService) Transfer(userID uuid.UUID, fromAccountID, toAccount
 			Note:            note,
 		}
 		return s.txRepo.Create(txRecord)
+	})
+}
+
+func (s *transactionService) GetTransactions(userID uuid.UUID, month, year int) ([]model.Transaction, error) {
+	return s.txRepo.FindByUserID(userID, month, year)
+}
+
+func (s *transactionService) UpdateTransaction(userID uuid.UUID, txID uuid.UUID, amount decimal.Decimal, category, note string) error {
+	return s.db.Transaction(func(dbTx *gorm.DB) error {
+		tx, err := s.txRepo.FindByID(txID)
+		if err != nil {
+			return errors.New("transaction not found")
+		}
+
+		if tx.UserID != userID {
+			return errors.New("unauthorized")
+		}
+
+		// Handle balance adjustments if amount changed
+		if !amount.Equal(tx.Amount) {
+			diff := amount.Sub(tx.Amount)
+			
+			acc, err := s.accountRepo.FindByID(tx.AccountID)
+			if err != nil {
+				return errors.New("account not found")
+			}
+
+			if tx.Type == model.Income {
+				acc.Balance = acc.Balance.Add(diff)
+			} else if tx.Type == model.Expense {
+				acc.Balance = acc.Balance.Sub(diff)
+			} else if tx.Type == model.Transfer {
+				acc.Balance = acc.Balance.Sub(diff)
+				if tx.TargetAccountID != nil {
+					targetAcc, err := s.accountRepo.FindByID(*tx.TargetAccountID)
+					if err != nil {
+						return errors.New("target account not found")
+					}
+					targetAcc.Balance = targetAcc.Balance.Add(diff)
+					if err := s.accountRepo.Update(targetAcc); err != nil {
+						return err
+					}
+				}
+			}
+
+			if err := s.accountRepo.Update(acc); err != nil {
+				return err
+			}
+			tx.Amount = amount
+		}
+
+		tx.Category = category
+		tx.Note = note
+
+		return s.txRepo.Update(tx)
+	})
+}
+
+func (s *transactionService) DeleteTransaction(userID uuid.UUID, txID uuid.UUID) error {
+	return s.db.Transaction(func(dbTx *gorm.DB) error {
+		tx, err := s.txRepo.FindByID(txID)
+		if err != nil {
+			return errors.New("transaction not found")
+		}
+
+		if tx.UserID != userID {
+			return errors.New("unauthorized")
+		}
+
+		// Reverse balance effect
+		acc, err := s.accountRepo.FindByID(tx.AccountID)
+		if err != nil {
+			return errors.New("account not found")
+		}
+
+		if tx.Type == model.Income {
+			acc.Balance = acc.Balance.Sub(tx.Amount)
+		} else if tx.Type == model.Expense {
+			acc.Balance = acc.Balance.Add(tx.Amount)
+		} else if tx.Type == model.Transfer {
+			acc.Balance = acc.Balance.Add(tx.Amount)
+			if tx.TargetAccountID != nil {
+				targetAcc, err := s.accountRepo.FindByID(*tx.TargetAccountID)
+				if err != nil {
+					return errors.New("target account not found")
+				}
+				targetAcc.Balance = targetAcc.Balance.Sub(tx.Amount)
+				if err := s.accountRepo.Update(targetAcc); err != nil {
+					return err
+				}
+			}
+		}
+
+		if err := s.accountRepo.Update(acc); err != nil {
+			return err
+		}
+
+		return s.txRepo.Delete(txID)
 	})
 }

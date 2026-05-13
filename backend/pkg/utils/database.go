@@ -3,8 +3,8 @@ package utils
 import (
 	"fmt"
 	"log"
-	"os"
 
+	"github.com/vault-pro/backend/internal/config"
 	"github.com/vault-pro/backend/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -13,16 +13,9 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDatabase() {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	sslmode := os.Getenv("DB_SSLMODE")
-
+func ConnectDatabase(cfg *config.Config) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Bangkok",
-		host, user, password, dbname, port, sslmode)
+		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort, cfg.DBSSLMode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),

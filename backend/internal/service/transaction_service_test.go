@@ -8,74 +8,11 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/vault-pro/backend/internal/mocks"
 	"github.com/vault-pro/backend/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-// MockAccountRepository is a mock of the AccountRepository interface
-type MockAccountRepository struct {
-	mock.Mock
-}
-
-func (m *MockAccountRepository) Create(account *model.Account) error {
-	args := m.Called(account)
-	return args.Error(0)
-}
-
-func (m *MockAccountRepository) FindByUserID(userID uuid.UUID) ([]model.Account, error) {
-	args := m.Called(userID)
-	return args.Get(0).([]model.Account), args.Error(1)
-}
-
-func (m *MockAccountRepository) FindByUserIDAndType(userID uuid.UUID, accType model.AccountType) (*model.Account, error) {
-	args := m.Called(userID, accType)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.Account), args.Error(1)
-}
-
-func (m *MockAccountRepository) Update(account *model.Account) error {
-	args := m.Called(account)
-	return args.Error(0)
-}
-
-func (m *MockAccountRepository) FindByID(id uuid.UUID) (*model.Account, error) {
-	args := m.Called(id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.Account), args.Error(1)
-}
-
-// MockTransactionRepository is a mock of the TransactionRepository interface
-type MockTransactionRepository struct {
-	mock.Mock
-}
-
-func (m *MockTransactionRepository) Create(tx *model.Transaction) error {
-	args := m.Called(tx)
-	return args.Error(0)
-}
-
-func (m *MockTransactionRepository) FindByUserID(userID uuid.UUID, month, year int) ([]model.Transaction, error) {
-	args := m.Called(userID, month, year)
-	return args.Get(0).([]model.Transaction), args.Error(1)
-}
-
-func (m *MockTransactionRepository) FindByID(id uuid.UUID) (*model.Transaction, error) {
-	args := m.Called(id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*model.Transaction), args.Error(1)
-}
-
-func (m *MockTransactionRepository) Delete(id uuid.UUID) error {
-	args := m.Called(id)
-	return args.Error(0)
-}
 
 func TestAddIncome_6JarDistribution(t *testing.T) {
 	// Setup sqlmock for GORM Transaction
@@ -88,8 +25,8 @@ func TestAddIncome_6JarDistribution(t *testing.T) {
 	}), &gorm.Config{})
 	assert.NoError(t, err)
 
-	mockAccountRepo := new(MockAccountRepository)
-	mockTxRepo := new(MockTransactionRepository)
+	mockAccountRepo := new(mocks.MockAccountRepository)
+	mockTxRepo := new(mocks.MockTransactionRepository)
 	service := NewTransactionService(mockTxRepo, mockAccountRepo, gormDB)
 
 	userID := uuid.New()
@@ -145,8 +82,8 @@ func TestAddExpense_Success(t *testing.T) {
 	defer db.Close()
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
 
-	mockAccountRepo := new(MockAccountRepository)
-	mockTxRepo := new(MockTransactionRepository)
+	mockAccountRepo := new(mocks.MockAccountRepository)
+	mockTxRepo := new(mocks.MockTransactionRepository)
 	service := NewTransactionService(mockTxRepo, mockAccountRepo, gormDB)
 
 	userID := uuid.New()
@@ -179,8 +116,8 @@ func TestTransfer_Success(t *testing.T) {
 	defer db.Close()
 	gormDB, _ := gorm.Open(postgres.New(postgres.Config{Conn: db}), &gorm.Config{})
 
-	mockAccountRepo := new(MockAccountRepository)
-	mockTxRepo := new(MockTransactionRepository)
+	mockAccountRepo := new(mocks.MockAccountRepository)
+	mockTxRepo := new(mocks.MockTransactionRepository)
 	service := NewTransactionService(mockTxRepo, mockAccountRepo, gormDB)
 
 	userID := uuid.New()

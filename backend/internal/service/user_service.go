@@ -16,31 +16,32 @@ type UserService interface {
 	GetUserByID(id uuid.UUID) (*model.User, error)
 }
 
+type userService struct {
+	userRepo     repository.UserRepository
+	tokenManager *utils.TokenManager
+}
+
+func NewUserService(userRepo repository.UserRepository, tokenManager *utils.TokenManager) UserService {
+	return &userService{userRepo: userRepo, tokenManager: tokenManager}
+}
+
 func (s *userService) RefreshToken(tokenString string) (string, string, error) {
-	claims, err := utils.ValidateToken(tokenString)
+	claims, err := s.tokenManager.ValidateToken(tokenString)
 	if err != nil {
 		return "", "", err
 	}
 
-	accessToken, err := utils.GenerateAccessToken(claims.UserID)
+	accessToken, err := s.tokenManager.GenerateAccessToken(claims.UserID)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(claims.UserID)
+	refreshToken, err := s.tokenManager.GenerateRefreshToken(claims.UserID)
 	if err != nil {
 		return "", "", err
 	}
 
 	return accessToken, refreshToken, nil
-}
-
-type userService struct {
-	userRepo repository.UserRepository
-}
-
-func NewUserService(userRepo repository.UserRepository) UserService {
-	return &userService{userRepo: userRepo}
 }
 
 func (s *userService) Register(username, email, password string) (*model.User, error) {
@@ -72,12 +73,12 @@ func (s *userService) Login(email, password string) (string, string, error) {
 		return "", "", errors.New("invalid email or password")
 	}
 
-	accessToken, err := utils.GenerateAccessToken(user.ID)
+	accessToken, err := s.tokenManager.GenerateAccessToken(user.ID)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user.ID)
+	refreshToken, err := s.tokenManager.GenerateRefreshToken(user.ID)
 	if err != nil {
 		return "", "", err
 	}

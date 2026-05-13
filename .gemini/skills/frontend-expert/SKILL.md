@@ -1,23 +1,25 @@
 ---
 name: frontend-expert
-description: Next.js architecture, Tailwind CSS V4+ design system, responsive layout, and data visualization (Recharts). Use when building UI components or the frontend app.
+description: Next.js (App Router) development, TypeScript safety, financial logic implementation, and API integration. Use when implementing frontend features, data fetching, or complex business logic in the web app.
 ---
 
-# Frontend Expert
+# Frontend Expert (Engineering)
 
-Expert procedural guidance for Next.js development and UI/UX design within the Vault Pro ecosystem.
+Expert procedural guidance for technical implementation within the Vault Pro frontend.
 
-## 1. UI/UX Design System (Tailwind CSS V4+)
-- **Color Palette:**
-    - **Background:** `bg-slate-950` (Main), `bg-slate-900` (Cards/Modals).
-    - **Accents:** `text-emerald-500` (Income/Profit), `text-rose-500` (Expense/Loss), `text-sky-500` (Transfers).
-    - **Border:** `border-slate-800`.
-- **Typography:** Sans-serif (Inter/Geist), monospaced for numeric values to ensure alignment.
+## 1. Core Architecture
+- **Framework:** Next.js (App Router). Prefer Server Components for data fetching.
+- **Type Safety:** Strict TypeScript usage. Define interfaces for all API responses and component props.
+- **State Management:** Use `Zustand` for global UI state and `React Query` (or SWR) for server state caching.
 
-## 2. Components & Layout
-- **Responsiveness:** Mobile-first approach for quick transaction entry.
-- **Dashboard:** Sidebar-based navigation with top header for user profile/notifications.
+## 2. Financial Precision
+- **Formatting:** Use `Intl.NumberFormat` for currency display.
+- **Logic:** Maintain precision using `Decimal.js` if performing calculations on the client side. Match backend decimal handling.
 
-## 3. Data Visualization
-- **Charts:** Use `Recharts` with custom tooltips matching the Slate theme.
-- **Chart Types:** Area charts for balance trends; Pie charts for Jar distribution.
+## 3. Data Integration
+- **API Client:** Use a centralized API client with automatic token refresh (NextAuth.js integration).
+- **Error Handling:** Implement robust error boundaries and toast notifications (Sonner) for API failures.
+
+## 4. Testing & Quality
+- **Unit Testing:** `Vitest` for business logic and utility functions.
+- **E2E Testing:** `Playwright` for critical paths (Auth, Transactions).

@@ -2,7 +2,6 @@ package utils
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -10,7 +9,28 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+type TokenManager struct {
+	secret             []byte
+	accessTokenExpiry  time.Duration
+	refreshTokenExpiry time.Duration
+}
+
+func NewTokenManager(secret string, accessExp, refreshExp string) (*TokenManager, error) {
+	aExp, err := time.ParseDuration(accessExp)
+	if err != nil {
+		return nil, err
+	}
+	rExp, err := time.ParseDuration(refreshExp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TokenManager{
+		secret:             []byte(secret),
+		accessTokenExpiry:  aExp,
+		refreshTokenExpiry: rExp,
+	}, nil
+}
 
 type Claims struct {
 	UserID uuid.UUID `json:"user_id"`
@@ -29,14 +49,8 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-// GenerateAccessToken generates a short-lived access token
-func GenerateAccessToken(userID uuid.UUID) (string, error) {
-	expirationTime := time.Now().Add(15 * time.Minute)
-	if exp := os.Getenv("JWT_ACCESS_EXPIRATION"); exp != "" {
-		if d, err := time.ParseDuration(exp); err == nil {
-			expirationTime = time.Now().Add(d)
-		}
-	}
+func (m *TokenManager) GenerateAccessToken(userID uuid.UUID) (string, error) {
+	expirationTime := time.Now().Add(m.accessTokenExpiry)
 
 	claims := &Claims{
 		UserID: userID,
@@ -47,17 +61,11 @@ func GenerateAccessToken(userID uuid.UUID) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(m.secret)
 }
 
-// GenerateRefreshToken generates a long-lived refresh token
-func GenerateRefreshToken(userID uuid.UUID) (string, error) {
-	expirationTime := time.Now().Add(168 * time.Hour) // Default 7 days
-	if exp := os.Getenv("JWT_REFRESH_EXPIRATION"); exp != "" {
-		if d, err := time.ParseDuration(exp); err == nil {
-			expirationTime = time.Now().Add(d)
-		}
-	}
+func (m *TokenManager) GenerateRefreshToken(userID uuid.UUID) (string, error) {
+	expirationTime := time.Now().Add(m.refreshTokenExpiry)
 
 	claims := &Claims{
 		UserID: userID,
@@ -68,13 +76,12 @@ func GenerateRefreshToken(userID uuid.UUID) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(m.secret)
 }
 
-// ValidateToken validates a JWT token and returns the claims
-func ValidateToken(tokenString string) (*Claims, error) {
+func (m *TokenManager) ValidateToken(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return m.secret, nil
 	})
 
 	if err != nil {

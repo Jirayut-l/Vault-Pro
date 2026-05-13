@@ -53,12 +53,15 @@ Vault Pro is a professional-grade personal finance management system designed to
 - **Validation:** A task is not considered complete until all tests pass.
 
 ## 6. Specialized Skills
-- Custom project guidance is modularized in the `.gemini/skills/` directory:
+- Custom project guidance is modularized in the .gemini/skills/ directory:
   - `financial-expert`: Math, 6-Jar logic, and investments.
   - `security-expert`: Auth flow, JWT, and encryption.
-  - `frontend-expert`: Next.js, Tailwind V4+, and Data Viz.
+  - `frontend-expert`: Next.js (App Router), TS safety, and API integration.
+  - `uxui-expert`: Design systems, Tailwind V4 styling, and accessibility.
+  - `devops-expert`: Docker, CI/CD, and infrastructure automation.
   - `backend-expert`: Go (Gin) standards and GORM modeling.
   - `qa-expert`: Testing standards and Playwright E2E.
+
 - The AI will automatically trigger these skills based on the task domain.
 
 ## 7. Development Workflow

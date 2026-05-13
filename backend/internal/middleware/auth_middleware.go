@@ -1,4 +1,4 @@
-package handler
+package middleware
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/vault-pro/backend/pkg/utils"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(tokenManager *utils.TokenManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -24,7 +24,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := utils.ValidateToken(parts[1])
+		claims, err := tokenManager.ValidateToken(parts[1])
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token", "success": false})
 			c.Abort()

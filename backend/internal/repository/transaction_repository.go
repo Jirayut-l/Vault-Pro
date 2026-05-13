@@ -11,19 +11,25 @@ type TransactionRepository interface {
 	FindByUserID(userID uuid.UUID, month, year int) ([]model.Transaction, error)
 	FindByID(id uuid.UUID) (*model.Transaction, error)
 	Delete(id uuid.UUID) error
-}
+	Update(tx *model.Transaction) error
+	}
 
-type transactionRepository struct {
+	type transactionRepository struct {
 	db *gorm.DB
-}
+	}
 
-func NewTransactionRepository(db *gorm.DB) TransactionRepository {
+	func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 	return &transactionRepository{db: db}
-}
+	}
 
-func (r *transactionRepository) Create(tx *model.Transaction) error {
+	func (r *transactionRepository) Create(tx *model.Transaction) error {
 	return r.db.Create(tx).Error
-}
+	}
+
+	func (r *transactionRepository) Update(tx *model.Transaction) error {
+	return r.db.Save(tx).Error
+	}
+
 
 func (r *transactionRepository) FindByUserID(userID uuid.UUID, month, year int) ([]model.Transaction, error) {
 	var transactions []model.Transaction

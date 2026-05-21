@@ -26,15 +26,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=vault_pro
-      - DB_SSLMODE=disable
-      - JWT_SECRET=your_super_secret_key_here
-      - PORT=8080
+    env_file:
+      - .env
     ports:
       - "8080:8080"
 

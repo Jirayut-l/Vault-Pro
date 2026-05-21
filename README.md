@@ -12,15 +12,6 @@
 
 ## 🛠️ เทคโนโลยีที่ใช้ (Tech Stack)
 
-### หน้าบ้าน (Frontend)
-- **Framework:** Next.js 15 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS V4+
-- **Components:** shadcn/ui (Nova Preset)
-- **Auth:** NextAuth.js
-- **Charts:** Recharts
-- **Math:** Decimal.js
-
 ### หลังบ้าน (Backend)
 - **Language:** Go (Golang)
 - **Framework:** Gin Web Framework
@@ -30,7 +21,7 @@
 
 ### โครงสร้างพื้นฐาน & QA
 - **Infrastructure:** Docker & Docker Compose (Multi-stage builds)
-- **QA:** Go testing/testify/sqlmock (Backend), Vitest (Frontend), Playwright (E2E)
+- **QA:** Go testing/testify/sqlmock (Backend)
 
 ## 🏗️ สถาปัตยกรรมของระบบ (Architecture)
 
@@ -44,12 +35,11 @@
 ## 🚦 การเริ่มต้นใช้งาน (Getting Started)
 
 ### วิธีที่ 1: ใช้งานผ่าน Docker (แนะนำ)
-คุณสามารถรันระบบทั้งหมด (Frontend, Backend, Database) ได้ด้วยคำสั่งเดียว:
+คุณสามารถรันระบบทั้งหมด (Backend, Database) ได้ด้วยคำสั่งเดียว:
 ```bash
 docker-compose up --build
 ```
 ระบบจะพร้อมใช้งานที่:
-- **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:8080/api/v1
 
 ### วิธีที่ 2: การพัฒนาแบบ Local
@@ -60,18 +50,10 @@ docker-compose up --build
    go mod download
    go run cmd/api/main.go
    ```
-3. **Frontend:**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
 
 ## 🧪 การทดสอบระบบ (Testing)
 
 - **Backend Unit Tests:** `cd backend && go test ./...`
-- **Frontend Unit Tests:** `cd frontend && npm test`
-- **End-to-End Tests:** `cd frontend && npx playwright test`
 
 ---
 *จัดทำโดยทีมพัฒนา Vault Pro*

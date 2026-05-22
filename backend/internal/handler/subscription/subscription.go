@@ -1,4 +1,4 @@
-package handler
+package subscription
 
 import (
 	"net/http"
@@ -9,12 +9,17 @@ import (
 	"github.com/vault-pro/backend/internal/service"
 )
 
-type SubscriptionHandler struct {
+type Handler struct {
 	subService service.SubscriptionService
 }
 
-func NewSubscriptionHandler(subService service.SubscriptionService) *SubscriptionHandler {
-	return &SubscriptionHandler{subService: subService}
+func NewHandler(subService service.SubscriptionService) *Handler {
+	return &Handler{subService: subService}
+}
+
+func (h *Handler) RegisterRoutes(r *gin.RouterGroup) {
+	r.GET("", h.GetAll)
+	r.POST("", h.Create)
 }
 
 type CreateSubscriptionRequest struct {
@@ -24,7 +29,7 @@ type CreateSubscriptionRequest struct {
 	BillingCycleDay int             `json:"billing_cycle_day" binding:"required,min=1,max=31"`
 }
 
-func (h *SubscriptionHandler) GetAll(c *gin.Context) {
+func (h *Handler) GetAll(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	subs, err := h.subService.GetSubscriptions(userID.(uuid.UUID))
 	if err != nil {
@@ -35,7 +40,7 @@ func (h *SubscriptionHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": subs})
 }
 
-func (h *SubscriptionHandler) Create(c *gin.Context) {
+func (h *Handler) Create(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	var req CreateSubscriptionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

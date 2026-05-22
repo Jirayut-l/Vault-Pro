@@ -16,7 +16,7 @@ func main() {
 	utils.ConnectDatabase(cfg)
 
 	// Initialize and Run Server
-	srv := server.NewServer(cfg, utils.DB)
+	srv := server.New(cfg, utils.DB)
 	if err := srv.Run(); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

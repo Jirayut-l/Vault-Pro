@@ -1,4 +1,4 @@
-package handler
+package transaction
 
 import (
 	"bytes"
@@ -16,10 +16,10 @@ import (
 	"github.com/vault-pro/backend/internal/model"
 )
 
-func TestTransactionHandler_Create_Income_Success(t *testing.T) {
+func TestHandler_Create_Income_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockService := new(mocks.MockTransactionService)
-	handler := NewTransactionHandler(mockService)
+	handler := NewHandler(mockService)
 	
 	r := gin.Default()
 	userID := uuid.New()
@@ -53,10 +53,10 @@ func TestTransactionHandler_Create_Income_Success(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestTransactionHandler_Create_Expense_Success(t *testing.T) {
+func TestHandler_Create_Expense_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockService := new(mocks.MockTransactionService)
-	handler := NewTransactionHandler(mockService)
+	handler := NewHandler(mockService)
 	
 	r := gin.Default()
 	userID := uuid.New()
@@ -91,10 +91,10 @@ func TestTransactionHandler_Create_Expense_Success(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestTransactionHandler_GetAll_Success(t *testing.T) {
+func TestHandler_GetAll_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockService := new(mocks.MockTransactionService)
-	handler := NewTransactionHandler(mockService)
+	handler := NewHandler(mockService)
 	
 	r := gin.Default()
 	userID := uuid.New()

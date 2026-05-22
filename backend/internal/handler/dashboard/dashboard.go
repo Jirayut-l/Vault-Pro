@@ -1,4 +1,4 @@
-package handler
+package dashboard
 
 import (
 	"net/http"
@@ -10,15 +10,20 @@ import (
 	"github.com/vault-pro/backend/internal/service"
 )
 
-type DashboardHandler struct {
+type Handler struct {
 	dashboardService service.DashboardService
 }
 
-func NewDashboardHandler(dashboardService service.DashboardService) *DashboardHandler {
-	return &DashboardHandler{dashboardService: dashboardService}
+func NewHandler(dashboardService service.DashboardService) *Handler {
+	return &Handler{dashboardService: dashboardService}
 }
 
-func (h *DashboardHandler) GetSummary(c *gin.Context) {
+func (h *Handler) RegisterRoutes(r *gin.RouterGroup) {
+	r.GET("/summary", h.GetSummary)
+	r.GET("/expenses-by-category", h.GetExpensesByCategory)
+}
+
+func (h *Handler) GetSummary(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	summary, err := h.dashboardService.GetSummary(userID.(uuid.UUID))
 	if err != nil {
@@ -29,7 +34,7 @@ func (h *DashboardHandler) GetSummary(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": summary})
 }
 
-func (h *DashboardHandler) GetExpensesByCategory(c *gin.Context) {
+func (h *Handler) GetExpensesByCategory(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	
 	now := time.Now()

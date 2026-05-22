@@ -1,4 +1,4 @@
-package handler
+package auth
 
 import (
 	"bytes"
@@ -14,10 +14,10 @@ import (
 	"github.com/vault-pro/backend/internal/model"
 )
 
-func TestAuthHandler_Register_Success(t *testing.T) {
+func TestHandler_Register_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockService := new(mocks.MockUserService)
-	handler := NewAuthHandler(mockService)
+	handler := NewHandler(mockService)
 	
 	r := gin.Default()
 	r.POST("/register", handler.Register)
@@ -45,10 +45,10 @@ func TestAuthHandler_Register_Success(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestAuthHandler_Login_Success(t *testing.T) {
+func TestHandler_Login_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mockService := new(mocks.MockUserService)
-	handler := NewAuthHandler(mockService)
+	handler := NewHandler(mockService)
 	
 	r := gin.Default()
 	r.POST("/login", handler.Login)

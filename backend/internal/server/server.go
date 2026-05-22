@@ -5,7 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vault-pro/backend/internal/config"
-	"github.com/vault-pro/backend/internal/handler"
+	"github.com/vault-pro/backend/internal/handler/auth"
+	"github.com/vault-pro/backend/internal/handler/dashboard"
+	"github.com/vault-pro/backend/internal/handler/investment"
+	"github.com/vault-pro/backend/internal/handler/subscription"
+	"github.com/vault-pro/backend/internal/handler/transaction"
 	"github.com/vault-pro/backend/internal/middleware"
 	"github.com/vault-pro/backend/internal/repository"
 	"github.com/vault-pro/backend/internal/service"
@@ -19,7 +23,7 @@ type Server struct {
 	db     *gorm.DB
 }
 
-func NewServer(cfg *config.Config, db *gorm.DB) *Server {
+func New(cfg *config.Config, db *gorm.DB) *Server {
 	s := &Server{
 		router: gin.Default(),
 		cfg:    cfg,
@@ -52,11 +56,11 @@ func (s *Server) setupRoutes() {
 	invService := service.NewInvestmentService(invRepo, accountRepo, txRepo, s.db)
 
 	// Initialize Handlers
-	authHandler := handler.NewAuthHandler(userService)
-	txHandler := handler.NewTransactionHandler(txService)
-	dashboardHandler := handler.NewDashboardHandler(dashboardService)
-	subHandler := handler.NewSubscriptionHandler(subService)
-	invHandler := handler.NewInvestmentHandler(invService)
+	authHandler := auth.NewHandler(userService)
+	txHandler := transaction.NewHandler(txService)
+	dashboardHandler := dashboard.NewHandler(dashboardService)
+	subHandler := subscription.NewHandler(subService)
+	invHandler := investment.NewHandler(invService)
 
 	// Base route
 	s.router.GET("/", func(c *gin.Context) {
@@ -69,39 +73,20 @@ func (s *Server) setupRoutes() {
 	authMiddleware := middleware.AuthMiddleware(tokenManager)
 	v1 := s.router.Group("/api/v1")
 	{
-		auth := v1.Group("/auth")
-		{
-			auth.POST("/register", authHandler.Register)
-			auth.POST("/login", authHandler.Login)
-			auth.POST("/refresh", authHandler.Refresh)
-			auth.GET("/me", authMiddleware, authHandler.Me)
-		}
+		authGroup := v1.Group("/auth")
+		authHandler.RegisterRoutes(authGroup, authMiddleware)
 
-		transactions := v1.Group("/transactions", authMiddleware)
-		{
-			transactions.GET("", txHandler.GetAll)
-			transactions.POST("", txHandler.Create)
-			transactions.PUT("/:id", txHandler.Update)
-			transactions.DELETE("/:id", txHandler.Delete)
-		}
+		transactionsGroup := v1.Group("/transactions", authMiddleware)
+		txHandler.RegisterRoutes(transactionsGroup)
 
-		dashboard := v1.Group("/dashboard", authMiddleware)
-		{
-			dashboard.GET("/summary", dashboardHandler.GetSummary)
-			dashboard.GET("/expenses-by-category", dashboardHandler.GetExpensesByCategory)
-		}
+		dashboardGroup := v1.Group("/dashboard", authMiddleware)
+		dashboardHandler.RegisterRoutes(dashboardGroup)
 
-		subscriptions := v1.Group("/subscriptions", authMiddleware)
-		{
-			subscriptions.GET("", subHandler.GetAll)
-			subscriptions.POST("", subHandler.Create)
-		}
+		subscriptionsGroup := v1.Group("/subscriptions", authMiddleware)
+		subHandler.RegisterRoutes(subscriptionsGroup)
 
-		investments := v1.Group("/investments", authMiddleware)
-		{
-			investments.GET("", invHandler.GetAll)
-			investments.POST("/buy", invHandler.Buy)
-		}
+		investmentsGroup := v1.Group("/investments", authMiddleware)
+		invHandler.RegisterRoutes(investmentsGroup)
 	}
 }
 

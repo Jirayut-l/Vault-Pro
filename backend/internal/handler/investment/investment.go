@@ -1,4 +1,4 @@
-package handler
+package investment
 
 import (
 	"net/http"
@@ -9,12 +9,17 @@ import (
 	"github.com/vault-pro/backend/internal/service"
 )
 
-type InvestmentHandler struct {
+type Handler struct {
 	invService service.InvestmentService
 }
 
-func NewInvestmentHandler(invService service.InvestmentService) *InvestmentHandler {
-	return &InvestmentHandler{invService: invService}
+func NewHandler(invService service.InvestmentService) *Handler {
+	return &Handler{invService: invService}
+}
+
+func (h *Handler) RegisterRoutes(r *gin.RouterGroup) {
+	r.GET("", h.GetAll)
+	r.POST("/buy", h.Buy)
 }
 
 type BuyInvestmentRequest struct {
@@ -26,7 +31,7 @@ type BuyInvestmentRequest struct {
 	Price     decimal.Decimal `json:"price" binding:"required"`
 }
 
-func (h *InvestmentHandler) GetAll(c *gin.Context) {
+func (h *Handler) GetAll(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	invs, err := h.invService.GetInvestments(userID.(uuid.UUID))
 	if err != nil {
@@ -37,7 +42,7 @@ func (h *InvestmentHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": invs})
 }
 
-func (h *InvestmentHandler) Buy(c *gin.Context) {
+func (h *Handler) Buy(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	var req BuyInvestmentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

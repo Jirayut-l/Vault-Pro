@@ -1,4 +1,4 @@
-package handler
+package auth
 
 import (
 	"net/http"
@@ -7,12 +7,19 @@ import (
 	"github.com/vault-pro/backend/internal/service"
 )
 
-type AuthHandler struct {
+type Handler struct {
 	userService service.UserService
 }
 
-func NewAuthHandler(userService service.UserService) *AuthHandler {
-	return &AuthHandler{userService: userService}
+func NewHandler(userService service.UserService) *Handler {
+	return &Handler{userService: userService}
+}
+
+func (h *Handler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
+	r.POST("/register", h.Register)
+	r.POST("/login", h.Login)
+	r.POST("/refresh", h.Refresh)
+	r.GET("/me", authMiddleware, h.Me)
 }
 
 type RegisterRequest struct {
@@ -26,7 +33,7 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-func (h *AuthHandler) Register(c *gin.Context) {
+func (h *Handler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "success": false})
@@ -50,7 +57,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	})
 }
 
-func (h *AuthHandler) Login(c *gin.Context) {
+func (h *Handler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "success": false})
@@ -76,7 +83,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
-func (h *AuthHandler) Refresh(c *gin.Context) {
+func (h *Handler) Refresh(c *gin.Context) {
 	refreshToken, err := c.Cookie("refresh_token")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token not found", "success": false})
@@ -102,7 +109,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 	})
 }
 
-func (h *AuthHandler) Me(c *gin.Context) {
+func (h *Handler) Me(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	
 	// In a real app, you might want to fetch full user info from DB

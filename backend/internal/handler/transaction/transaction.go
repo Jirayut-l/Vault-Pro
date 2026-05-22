@@ -1,4 +1,4 @@
-package handler
+package transaction
 
 import (
 	"net/http"
@@ -11,12 +11,19 @@ import (
 	"github.com/vault-pro/backend/internal/service"
 )
 
-type TransactionHandler struct {
+type Handler struct {
 	txService service.TransactionService
 }
 
-func NewTransactionHandler(txService service.TransactionService) *TransactionHandler {
-	return &TransactionHandler{txService: txService}
+func NewHandler(txService service.TransactionService) *Handler {
+	return &Handler{txService: txService}
+}
+
+func (h *Handler) RegisterRoutes(r *gin.RouterGroup) {
+	r.GET("", h.GetAll)
+	r.POST("", h.Create)
+	r.PUT("/:id", h.Update)
+	r.DELETE("/:id", h.Delete)
 }
 
 type CreateTransactionRequest struct {
@@ -34,7 +41,7 @@ type UpdateTransactionRequest struct {
 	Note     string          `json:"note"`
 }
 
-func (h *TransactionHandler) GetAll(c *gin.Context) {
+func (h *Handler) GetAll(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	
 	monthStr := c.Query("month")
@@ -52,7 +59,7 @@ func (h *TransactionHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": transactions})
 }
 
-func (h *TransactionHandler) Create(c *gin.Context) {
+func (h *Handler) Create(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	var req CreateTransactionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -89,7 +96,7 @@ func (h *TransactionHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Transaction created successfully", "success": true})
 }
 
-func (h *TransactionHandler) Update(c *gin.Context) {
+func (h *Handler) Update(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	idStr := c.Param("id")
 	txID, err := uuid.Parse(idStr)
@@ -113,7 +120,7 @@ func (h *TransactionHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Transaction updated successfully", "success": true})
 }
 
-func (h *TransactionHandler) Delete(c *gin.Context) {
+func (h *Handler) Delete(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	idStr := c.Param("id")
 	txID, err := uuid.Parse(idStr)

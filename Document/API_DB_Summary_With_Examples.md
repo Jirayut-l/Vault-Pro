@@ -250,6 +250,31 @@ Core CRUD endpoints for managing daily financial activity.
           "transaction_date": "2026-05-22T13:00:00Z"
         }
         ```
+*   **`POST /api/v1/transactions/bulk`**
+    *   **Explanation**: Creates multiple transactions in a single request. This is optimized for bulk data import.
+    *   **Example Request Body:**
+        ```json
+        {
+          "transactions": [
+            {
+              "account_id": "550e8400-e29b-41d4-a716-446655440000",
+              "amount": "150.00",
+              "type": "EXPENSE",
+              "category": "Groceries",
+              "note": "Weekend shopping",
+              "transaction_date": "2026-05-22T10:00:00Z"
+            },
+            {
+              "account_id": "550e8400-e29b-41d4-a716-446655440000",
+              "amount": "2000.00",
+              "type": "INCOME",
+              "category": "Salary",
+              "note": "Bonus",
+              "transaction_date": "2026-05-22T10:05:00Z"
+            }
+          ]
+        }
+        ```
 *   **`PUT /api/v1/transactions/{id}`**
     *   **Explanation**: Updates details of an existing transaction (e.g., fixing a typo in the amount or re-categorizing).
 *   **`DELETE /api/v1/transactions/{id}`**

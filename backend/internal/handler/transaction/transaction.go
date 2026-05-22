@@ -8,14 +8,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/vault-pro/backend/internal/model"
-	"github.com/vault-pro/backend/internal/service"
+	"github.com/vault-pro/backend/internal/service/transaction"
 )
 
 type Handler struct {
-	txService service.TransactionService
+	txService transaction.TransactionService
 }
 
-func NewHandler(txService service.TransactionService) *Handler {
+func NewHandler(txService transaction.TransactionService) *Handler {
 	return &Handler{txService: txService}
 }
 

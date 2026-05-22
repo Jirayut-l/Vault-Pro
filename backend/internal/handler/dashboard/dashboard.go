@@ -7,14 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/vault-pro/backend/internal/service"
+	"github.com/vault-pro/backend/internal/service/dashboard"
 )
 
 type Handler struct {
-	dashboardService service.DashboardService
+	dashboardService dashboard.DashboardService
 }
 
-func NewHandler(dashboardService service.DashboardService) *Handler {
+func NewHandler(dashboardService dashboard.DashboardService) *Handler {
 	return &Handler{dashboardService: dashboardService}
 }
 

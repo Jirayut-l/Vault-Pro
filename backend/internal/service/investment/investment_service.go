@@ -1,4 +1,4 @@
-package service
+package investment
 
 import (
 	"errors"

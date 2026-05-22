@@ -12,7 +12,11 @@ import (
 	"github.com/vault-pro/backend/internal/handler/transaction"
 	"github.com/vault-pro/backend/internal/middleware"
 	"github.com/vault-pro/backend/internal/repository"
-	"github.com/vault-pro/backend/internal/service"
+	dashboardSvc "github.com/vault-pro/backend/internal/service/dashboard"
+	investmentSvc "github.com/vault-pro/backend/internal/service/investment"
+	subscriptionSvc "github.com/vault-pro/backend/internal/service/subscription"
+	transactionSvc "github.com/vault-pro/backend/internal/service/transaction"
+	userSvc "github.com/vault-pro/backend/internal/service/user"
 	"github.com/vault-pro/backend/pkg/utils"
 	"gorm.io/gorm"
 )
@@ -49,11 +53,11 @@ func (s *Server) setupRoutes() {
 	invRepo := repository.NewInvestmentRepository(s.db)
 
 	// Initialize Services
-	userService := service.NewUserService(userRepo, tokenManager)
-	txService := service.NewTransactionService(txRepo, accountRepo, s.db)
-	dashboardService := service.NewDashboardService(accountRepo, txRepo)
-	subService := service.NewSubscriptionService(subRepo)
-	invService := service.NewInvestmentService(invRepo, accountRepo, txRepo, s.db)
+	userService := userSvc.NewUserService(userRepo, tokenManager)
+	txService := transactionSvc.NewTransactionService(txRepo, accountRepo, s.db)
+	dashboardService := dashboardSvc.NewDashboardService(accountRepo, txRepo)
+	subService := subscriptionSvc.NewSubscriptionService(subRepo)
+	invService := investmentSvc.NewInvestmentService(invRepo, accountRepo, txRepo, s.db)
 
 	// Initialize Handlers
 	authHandler := auth.NewHandler(userService)

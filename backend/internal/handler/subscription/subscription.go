@@ -6,14 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	"github.com/vault-pro/backend/internal/service"
+	"github.com/vault-pro/backend/internal/service/subscription"
 )
 
 type Handler struct {
-	subService service.SubscriptionService
+	subService subscription.SubscriptionService
 }
 
-func NewHandler(subService service.SubscriptionService) *Handler {
+func NewHandler(subService subscription.SubscriptionService) *Handler {
 	return &Handler{subService: subService}
 }
 

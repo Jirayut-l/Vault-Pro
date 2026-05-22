@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vault-pro/backend/internal/service"
+	"github.com/vault-pro/backend/internal/service/user"
 )
 
 type Handler struct {
-	userService service.UserService
+	userService user.UserService
 }
 
-func NewHandler(userService service.UserService) *Handler {
+func NewHandler(userService user.UserService) *Handler {
 	return &Handler{userService: userService}
 }
 

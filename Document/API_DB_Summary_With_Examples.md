@@ -144,7 +144,14 @@ All protected endpoints require a valid JWT Access Token passed via the HTTP Hea
 `Authorization: Bearer <access_token>`
 
 ### 2.1 Authentication APIs
-These endpoints manage user identities and sessions securely using JWT.
+
+These endpoints manage user identities and sessions securely using a robust JWT strategy. 
+
+**Authentication Concept & Security**
+*   **Token Flow**: The system relies on a stateless backend using dual-token JWT architecture. 
+*   **Access Token**: Short-lived (15-30 minutes). Returned in the API response and stored in memory on the frontend for authenticating standard requests.
+*   **Refresh Token**: Long-lived (7-30 days). Set securely by the server as an `HttpOnly` cookie to prevent XSS attacks. Used to obtain new Access Tokens without requiring the user to re-login frequently.
+*   **Security Measures**: Passwords are hashed using bcrypt before storage. All incoming data is rigorously validated on the server side.
 
 *   **`POST /api/v1/auth/register`**
     *   **Explanation**: Registers a new user in the system. Hashes the password securely and sets up initial Jar data.
@@ -183,6 +190,16 @@ These endpoints manage user identities and sessions securely using JWT.
             "id": "123e4567-e89b-12d3-a456-426614174000",
             "email": "alex.invest@example.com"
           }
+        }
+        ```
+
+*   **`POST /api/v1/auth/refresh`**
+    *   **Explanation**: Generates a new short-lived Access Token using a valid long-lived Refresh Token (which is automatically read from the user's `HttpOnly` cookies). This ensures continuous, secure authentication sessions without requiring frequent manual logins.
+    *   **Example Response (200 OK):**
+        ```json
+        {
+          "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "expires_in": 1800
         }
         ```
 

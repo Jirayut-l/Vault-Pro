@@ -17,6 +17,7 @@ type TransactionService interface {
 	GetTransactions(userID uuid.UUID, month, year int) ([]model.Transaction, error)
 	UpdateTransaction(userID uuid.UUID, txID uuid.UUID, amount decimal.Decimal, category, note string) error
 	DeleteTransaction(userID uuid.UUID, txID uuid.UUID) error
+	BulkAddTransactions(userID uuid.UUID, transactions []model.Transaction) error
 }
 
 type transactionService struct {
@@ -78,6 +79,68 @@ func (s *transactionService) AddIncome(userID uuid.UUID, amount decimal.Decimal,
 			}
 		}
 
+		return nil
+	})
+}
+
+func (s *transactionService) BulkAddTransactions(userID uuid.UUID, transactions []model.Transaction) error {
+	return s.db.Transaction(func(dbTx *gorm.DB) error {
+		balanceAdjustments := make(map[uuid.UUID]decimal.Decimal)
+		var txRecords []model.Transaction
+
+		for _, tx := range transactions {
+			if tx.UserID != userID && tx.UserID != uuid.Nil {
+				return errors.New("unauthorized transaction user ID")
+			}
+			
+			txRecord := tx
+			txRecord.UserID = userID
+			if txRecord.ID == uuid.Nil {
+				txRecord.ID = uuid.New()
+			}
+			
+			if tx.Type == model.Income {
+				if tx.AccountID == uuid.Nil {
+					return errors.New("income in bulk must specify an account ID")
+				}
+				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Add(tx.Amount)
+			} else if tx.Type == model.Expense {
+				if tx.AccountID == uuid.Nil {
+					return errors.New("expense must specify an account ID")
+				}
+				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Sub(tx.Amount)
+			} else if tx.Type == model.Transfer {
+				if tx.AccountID == uuid.Nil || tx.TargetAccountID == nil || *tx.TargetAccountID == uuid.Nil {
+					return errors.New("transfer must specify source and target account IDs")
+				}
+				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Sub(tx.Amount)
+				balanceAdjustments[*tx.TargetAccountID] = balanceAdjustments[*tx.TargetAccountID].Add(tx.Amount)
+			} else {
+				return errors.New("invalid transaction type in bulk payload")
+			}
+			txRecords = append(txRecords, txRecord)
+		}
+
+		for accountID, adj := range balanceAdjustments {
+			if adj.IsZero() {
+				continue
+			}
+			acc, err := s.accountRepo.FindByID(accountID)
+			if err != nil {
+				return err
+			}
+			if acc.UserID != userID {
+				return errors.New("unauthorized account modification")
+			}
+			acc.Balance = acc.Balance.Add(adj)
+			if err := s.accountRepo.Update(acc); err != nil {
+				return err
+			}
+		}
+
+		if len(txRecords) > 0 {
+			return s.txRepo.BulkCreate(txRecords)
+		}
 		return nil
 	})
 }

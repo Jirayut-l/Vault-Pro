@@ -22,6 +22,7 @@ func NewHandler(txService service.TransactionService) *Handler {
 func (h *Handler) RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("", h.GetAll)
 	r.POST("", h.Create)
+	r.POST("/bulk", h.BulkCreate)
 	r.PUT("/:id", h.Update)
 	r.DELETE("/:id", h.Delete)
 }
@@ -34,6 +35,11 @@ type CreateTransactionRequest struct {
 	Category        string                `json:"category"`
 	Note            string                `json:"note"`
 }
+
+type BulkCreateTransactionRequest struct {
+	Transactions []model.Transaction `json:"transactions" binding:"required,dive"`
+}
+
 
 type UpdateTransactionRequest struct {
 	Amount   decimal.Decimal `json:"amount" binding:"required"`
@@ -95,6 +101,24 @@ func (h *Handler) Create(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Transaction created successfully", "success": true})
 }
+
+func (h *Handler) BulkCreate(c *gin.Context) {
+	userID, _ := c.Get("userID")
+	var req BulkCreateTransactionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "success": false})
+		return
+	}
+
+	err := h.txService.BulkAddTransactions(userID.(uuid.UUID), req.Transactions)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Bulk transactions created successfully", "success": true})
+}
+
 
 func (h *Handler) Update(c *gin.Context) {
 	userID, _ := c.Get("userID")

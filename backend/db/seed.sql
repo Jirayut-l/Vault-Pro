@@ -1,41 +1,54 @@
 -- Vault Pro - Database Seed Script
 -- Purpose: Populate the database with initial mock data for local development and testing.
+-- Matches data from API_DB_Summary_With_Examples.md
 -- Password for the test user is "password123"
 
 -- Clear existing data (optional, use with caution)
--- TRUNCATE users, accounts, transactions RESTART IDENTITY CASCADE;
+TRUNCATE users, accounts, transactions, subscriptions, investments RESTART IDENTITY CASCADE;
 
--- 1. Insert Test User
--- UUID: 550e8400-e29b-41d4-a716-446655440000
+-- 1. Insert Test User (Alex Doe)
+-- UUID: 123e4567-e89b-12d3-a456-426614174000
 -- Password Hash: bcrypt for "password123"
 INSERT INTO users (id, username, email, password, created_at, updated_at)
 VALUES (
-    '550e8400-e29b-41d4-a716-446655440000',
-    'tester',
+    '123e4567-e89b-12d3-a456-426614174000',
+    'Alex',
     'test@example.com',
-    '$2a$10$8K1p/a06v.f.q.l.k.l.k.u.v.v.v.v.v.v.v.v.v.v.v.v.v.v.',
+    '$2a$10$KDhQj5JwsvebKdz8bO4H5usQq8XtLK5e7BwvISZPdX.jcamYNeWdy',
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
--- 2. Insert 6-Jar Accounts for the Test User
--- Necessity (NEC) - 55%
+-- 2. Insert 6-Jar Accounts for Alex Doe
+-- Necessity Fund (NEC)
 INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
 VALUES (
-    '550e8400-e29b-41d4-a716-446655440001',
     '550e8400-e29b-41d4-a716-446655440000',
-    'Necessities',
+    '123e4567-e89b-12d3-a456-426614174000',
+    'Necessity Fund',
     'NEC',
-    27500.00,
-    NOW(),
+    15000.50,
+    '2026-05-22 08:05:00',
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
--- Financial Freedom (FFA) - 10%
+-- Play Account (PLY)
 INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
 VALUES (
-    '550e8400-e29b-41d4-a716-446655440002',
-    '550e8400-e29b-41d4-a716-446655440000',
+    '660e8400-e29b-41d4-a716-446655440001',
+    '123e4567-e89b-12d3-a456-426614174000',
+    'Play Account',
+    'PLY',
+    3000.00,
+    '2026-05-22 08:05:00',
+    NOW()
+) ON CONFLICT (id) DO NOTHING;
+
+-- Financial Freedom (FFA)
+INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
+VALUES (
+    '770e8400-e29b-41d4-a716-446655440002',
+    '123e4567-e89b-12d3-a456-426614174000',
     'Financial Freedom',
     'FFA',
     5000.00,
@@ -43,11 +56,11 @@ VALUES (
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
--- Long-term Savings (LTS) - 10%
+-- Long-term Savings (LTS)
 INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
 VALUES (
-    '550e8400-e29b-41d4-a716-446655440003',
-    '550e8400-e29b-41d4-a716-446655440000',
+    '880e8400-e29b-41d4-a716-446655440003',
+    '123e4567-e89b-12d3-a456-426614174000',
     'Long-term Savings',
     'LTS',
     5000.00,
@@ -55,11 +68,11 @@ VALUES (
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
--- Education (EDU) - 10%
+-- Education (EDU)
 INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
 VALUES (
-    '550e8400-e29b-41d4-a716-446655440004',
-    '550e8400-e29b-41d4-a716-446655440000',
+    '990e8400-e29b-41d4-a716-446655440004',
+    '123e4567-e89b-12d3-a456-426614174000',
     'Education',
     'EDU',
     5000.00,
@@ -67,23 +80,11 @@ VALUES (
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
--- Play (PLY) - 10%
+-- Give (GIV)
 INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
 VALUES (
-    '550e8400-e29b-41d4-a716-446655440005',
-    '550e8400-e29b-41d4-a716-446655440000',
-    'Play',
-    'PLY',
-    5000.00,
-    NOW(),
-    NOW()
-) ON CONFLICT (id) DO NOTHING;
-
--- Give (GIV) - 5%
-INSERT INTO accounts (id, user_id, name, type, balance, created_at, updated_at)
-VALUES (
-    '550e8400-e29b-41d4-a716-446655440006',
-    '550e8400-e29b-41d4-a716-446655440000',
+    'aa0e8400-e29b-41d4-a716-446655440005',
+    '123e4567-e89b-12d3-a456-426614174000',
     'Give',
     'GIV',
     2500.00,
@@ -92,78 +93,62 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- 3. Insert Mock Transactions
--- Income: Monthly Salary
-INSERT INTO transactions (id, user_id, account_id, amount, type, category, note, transaction_date, created_at, updated_at)
-VALUES (
-    gen_random_uuid(),
-    '550e8400-e29b-41d4-a716-446655440000',
-    '550e8400-e29b-41d4-a716-446655440001',
-    50000.00,
-    'INCOME',
-    'Salary',
-    'May 2026 Salary',
-    NOW() - INTERVAL '5 days',
-    NOW(),
-    NOW()
-);
-
--- Expense: Rent
-INSERT INTO transactions (id, user_id, account_id, amount, type, category, note, transaction_date, created_at, updated_at)
-VALUES (
-    gen_random_uuid(),
-    '550e8400-e29b-41d4-a716-446655440000',
-    '550e8400-e29b-41d4-a716-446655440001',
-    15000.00,
-    'EXPENSE',
-    'Housing',
-    'Monthly Rent',
-    NOW() - INTERVAL '4 days',
-    NOW(),
-    NOW()
-);
-
 -- Expense: Groceries
-INSERT INTO transactions (id, user_id, account_id, amount, type, category, note, transaction_date, created_at, updated_at)
-VALUES (
-    gen_random_uuid(),
-    '550e8400-e29b-41d4-a716-446655440000',
-    '550e8400-e29b-41d4-a716-446655440001',
-    2000.00,
-    'EXPENSE',
-    'Food',
-    'Weekly groceries',
-    NOW() - INTERVAL '3 days',
-    NOW(),
-    NOW()
-);
-
--- Expense: Course
-INSERT INTO transactions (id, user_id, account_id, amount, type, category, note, transaction_date, created_at, updated_at)
-VALUES (
-    gen_random_uuid(),
-    '550e8400-e29b-41d4-a716-446655440000',
-    '550e8400-e29b-41d4-a716-446655440004',
-    3000.00,
-    'EXPENSE',
-    'Education',
-    'Go Programming Course',
-    NOW() - INTERVAL '2 days',
-    NOW(),
-    NOW()
-);
-
--- Transfer: FFA to Investment Account (Simulation)
 INSERT INTO transactions (id, user_id, account_id, target_account_id, amount, type, category, note, transaction_date, created_at, updated_at)
 VALUES (
-    gen_random_uuid(),
+    '770e8400-e29b-41d4-a716-446655440000',
+    '123e4567-e89b-12d3-a456-426614174000',
     '550e8400-e29b-41d4-a716-446655440000',
-    '550e8400-e29b-41d4-a716-446655440002',
-    '550e8400-e29b-41d4-a716-446655440003',
-    1000.00,
-    'TRANSFER',
-    'Investment',
-    'Moving to long-term savings',
-    NOW() - INTERVAL '1 day',
+    NULL,
+    120.00,
+    'EXPENSE',
+    'Groceries',
+    'Supermarket purchase',
+    '2026-05-22 10:30:00',
     NOW(),
     NOW()
-);
+) ON CONFLICT (id) DO NOTHING;
+
+-- Transfer: Internal Transfer
+INSERT INTO transactions (id, user_id, account_id, target_account_id, amount, type, category, note, transaction_date, created_at, updated_at)
+VALUES (
+    '880e8400-e29b-41d4-a716-446655440000',
+    '123e4567-e89b-12d3-a456-426614174000',
+    '550e8400-e29b-41d4-a716-446655440000',
+    '660e8400-e29b-41d4-a716-446655440001',
+    500.00,
+    'TRANSFER',
+    'Internal Transfer',
+    'Transfer to Play Account',
+    '2026-05-22 11:00:00',
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO NOTHING;
+
+-- 4. Insert Mock Subscriptions
+INSERT INTO subscriptions (id, user_id, account_id, name, amount, billing_cycle_day, created_at, updated_at)
+VALUES (
+    gen_random_uuid(),
+    '123e4567-e89b-12d3-a456-426614174000',
+    '550e8400-e29b-41d4-a716-446655440000',
+    'Netflix Premium',
+    419.00,
+    15,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO NOTHING;
+
+-- 5. Insert Mock Investments
+INSERT INTO investments (id, user_id, account_id, name, symbol, type, units, avg_cost, created_at, updated_at)
+VALUES (
+    gen_random_uuid(),
+    '123e4567-e89b-12d3-a456-426614174000',
+    '770e8400-e29b-41d4-a716-446655440002',
+    'K-USA-A(D) Fund',
+    'K-USA-A(D)',
+    'ETF',
+    245.55,
+    20.3624,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO NOTHING;

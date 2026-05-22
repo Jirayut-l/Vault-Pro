@@ -12,7 +12,8 @@ type TransactionRepository interface {
 	FindByID(id uuid.UUID) (*model.Transaction, error)
 	Delete(id uuid.UUID) error
 	Update(tx *model.Transaction) error
-	}
+	BulkCreate(txs []model.Transaction) error
+}
 
 	type transactionRepository struct {
 	db *gorm.DB
@@ -24,6 +25,10 @@ type TransactionRepository interface {
 
 	func (r *transactionRepository) Create(tx *model.Transaction) error {
 	return r.db.Create(tx).Error
+	}
+
+	func (r *transactionRepository) BulkCreate(txs []model.Transaction) error {
+	return r.db.CreateInBatches(txs, 100).Error
 	}
 
 	func (r *transactionRepository) Update(tx *model.Transaction) error {

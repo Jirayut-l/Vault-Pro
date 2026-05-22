@@ -79,6 +79,11 @@ func (m *MockTransactionRepository) Create(tx *model.Transaction) error {
 	return args.Error(0)
 }
 
+func (m *MockTransactionRepository) BulkCreate(txs []model.Transaction) error {
+	args := m.Called(txs)
+	return args.Error(0)
+}
+
 func (m *MockTransactionRepository) Update(tx *model.Transaction) error {
 	args := m.Called(tx)
 	return args.Error(0)
@@ -134,6 +139,11 @@ func (m *MockTransactionService) UpdateTransaction(userID uuid.UUID, txID uuid.U
 
 func (m *MockTransactionService) DeleteTransaction(userID uuid.UUID, txID uuid.UUID) error {
 	args := m.Called(userID, txID)
+	return args.Error(0)
+}
+
+func (m *MockTransactionService) BulkAddTransactions(userID uuid.UUID, transactions []model.Transaction) error {
+	args := m.Called(userID, transactions)
 	return args.Error(0)
 }
 

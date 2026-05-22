@@ -10,6 +10,26 @@ import (
 	"gorm.io/gorm"
 )
 
+// Standard service errors
+var (
+	ErrAccountNotFound        = errors.New("account not found")
+	ErrTransactionNotFound    = errors.New("transaction not found")
+	ErrUnauthorized           = errors.New("unauthorized access")
+	ErrInvalidTransactionType = errors.New("invalid transaction type")
+	ErrMissingAccountID       = errors.New("missing account ID")
+	ErrMissingTargetAccountID = errors.New("missing target account ID")
+)
+
+// Income allocation percentages as per 6-Jars logic
+var incomeAllocationPercentages = map[model.AccountType]decimal.Decimal{
+	model.NEC: decimal.NewFromFloat(0.55),
+	model.FFA: decimal.NewFromFloat(0.10),
+	model.LTS: decimal.NewFromFloat(0.10),
+	model.EDU: decimal.NewFromFloat(0.10),
+	model.PLY: decimal.NewFromFloat(0.10),
+	model.GIV: decimal.NewFromFloat(0.05),
+}
+
 type TransactionService interface {
 	AddIncome(userID uuid.UUID, amount decimal.Decimal, category, note string) error
 	AddExpense(userID uuid.UUID, accountID uuid.UUID, amount decimal.Decimal, category, note string) error
@@ -27,23 +47,17 @@ type transactionService struct {
 }
 
 func NewTransactionService(txRepo repository.TransactionRepository, accountRepo repository.AccountRepository, db *gorm.DB) TransactionService {
-	return &transactionService{txRepo: txRepo, accountRepo: accountRepo, db: db}
+	return &transactionService{
+		txRepo:      txRepo,
+		accountRepo: accountRepo,
+		db:          db,
+	}
 }
 
+// AddIncome distributes the income amount across the 6 jars based on standard percentages.
 func (s *transactionService) AddIncome(userID uuid.UUID, amount decimal.Decimal, category, note string) error {
-	// Use transaction for atomic operation
 	return s.db.Transaction(func(dbTx *gorm.DB) error {
-		// Percentages as defined in SKILLS.md
-		percentages := map[model.AccountType]decimal.Decimal{
-			model.NEC: decimal.NewFromFloat(0.55),
-			model.FFA: decimal.NewFromFloat(0.10),
-			model.LTS: decimal.NewFromFloat(0.10),
-			model.EDU: decimal.NewFromFloat(0.10),
-			model.PLY: decimal.NewFromFloat(0.10),
-			model.GIV: decimal.NewFromFloat(0.05),
-		}
-
-		for accType, percent := range percentages {
+		for accType, percent := range incomeAllocationPercentages {
 			acc, err := s.accountRepo.FindByUserIDAndType(userID, accType)
 			if err != nil {
 				// If account doesn't exist, create it (default behavior for new users)
@@ -65,7 +79,6 @@ func (s *transactionService) AddIncome(userID uuid.UUID, amount decimal.Decimal,
 				return err
 			}
 
-			// Record transaction for each jar
 			txRecord := &model.Transaction{
 				UserID:    userID,
 				AccountID: acc.ID,
@@ -74,90 +87,23 @@ func (s *transactionService) AddIncome(userID uuid.UUID, amount decimal.Decimal,
 				Category:  category,
 				Note:      note,
 			}
+
 			if err := s.txRepo.Create(txRecord); err != nil {
 				return err
 			}
 		}
-
 		return nil
 	})
 }
 
-func (s *transactionService) BulkAddTransactions(userID uuid.UUID, transactions []model.Transaction) error {
-	return s.db.Transaction(func(dbTx *gorm.DB) error {
-		balanceAdjustments := make(map[uuid.UUID]decimal.Decimal)
-		var txRecords []model.Transaction
-
-		for _, tx := range transactions {
-			if tx.UserID != userID && tx.UserID != uuid.Nil {
-				return errors.New("unauthorized transaction user ID")
-			}
-			
-			txRecord := tx
-			txRecord.UserID = userID
-			if txRecord.ID == uuid.Nil {
-				txRecord.ID = uuid.New()
-			}
-			
-			if tx.Type == model.Income {
-				if tx.AccountID == uuid.Nil {
-					return errors.New("income in bulk must specify an account ID")
-				}
-				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Add(tx.Amount)
-			} else if tx.Type == model.Expense {
-				if tx.AccountID == uuid.Nil {
-					return errors.New("expense must specify an account ID")
-				}
-				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Sub(tx.Amount)
-			} else if tx.Type == model.Transfer {
-				if tx.AccountID == uuid.Nil || tx.TargetAccountID == nil || *tx.TargetAccountID == uuid.Nil {
-					return errors.New("transfer must specify source and target account IDs")
-				}
-				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Sub(tx.Amount)
-				balanceAdjustments[*tx.TargetAccountID] = balanceAdjustments[*tx.TargetAccountID].Add(tx.Amount)
-			} else {
-				return errors.New("invalid transaction type in bulk payload")
-			}
-			txRecords = append(txRecords, txRecord)
-		}
-
-		for accountID, adj := range balanceAdjustments {
-			if adj.IsZero() {
-				continue
-			}
-			acc, err := s.accountRepo.FindByID(accountID)
-			if err != nil {
-				return err
-			}
-			if acc.UserID != userID {
-				return errors.New("unauthorized account modification")
-			}
-			acc.Balance = acc.Balance.Add(adj)
-			if err := s.accountRepo.Update(acc); err != nil {
-				return err
-			}
-		}
-
-		if len(txRecords) > 0 {
-			return s.txRepo.BulkCreate(txRecords)
-		}
-		return nil
-	})
-}
-
+// AddExpense subtracts the amount from a specific account.
 func (s *transactionService) AddExpense(userID uuid.UUID, accountID uuid.UUID, amount decimal.Decimal, category, note string) error {
 	return s.db.Transaction(func(dbTx *gorm.DB) error {
-		acc, err := s.accountRepo.FindByID(accountID)
-		if err != nil {
-			return errors.New("account not found")
+		if _, err := s.getValidAccount(accountID, userID); err != nil {
+			return err
 		}
 
-		if acc.UserID != userID {
-			return errors.New("unauthorized")
-		}
-
-		acc.Balance = acc.Balance.Sub(amount)
-		if err := s.accountRepo.Update(acc); err != nil {
+		if err := s.adjustBalances(accountID, nil, model.Expense, amount); err != nil {
 			return err
 		}
 
@@ -173,29 +119,17 @@ func (s *transactionService) AddExpense(userID uuid.UUID, accountID uuid.UUID, a
 	})
 }
 
+// Transfer moves an amount from one account to another.
 func (s *transactionService) Transfer(userID uuid.UUID, fromAccountID, toAccountID uuid.UUID, amount decimal.Decimal, note string) error {
 	return s.db.Transaction(func(dbTx *gorm.DB) error {
-		fromAcc, err := s.accountRepo.FindByID(fromAccountID)
-		if err != nil {
-			return errors.New("source account not found")
-		}
-
-		toAcc, err := s.accountRepo.FindByID(toAccountID)
-		if err != nil {
-			return errors.New("target account not found")
-		}
-
-		if fromAcc.UserID != userID || toAcc.UserID != userID {
-			return errors.New("unauthorized")
-		}
-
-		fromAcc.Balance = fromAcc.Balance.Sub(amount)
-		toAcc.Balance = toAcc.Balance.Add(amount)
-
-		if err := s.accountRepo.Update(fromAcc); err != nil {
+		if _, err := s.getValidAccount(fromAccountID, userID); err != nil {
 			return err
 		}
-		if err := s.accountRepo.Update(toAcc); err != nil {
+		if _, err := s.getValidAccount(toAccountID, userID); err != nil {
+			return err
+		}
+
+		if err := s.adjustBalances(fromAccountID, &toAccountID, model.Transfer, amount); err != nil {
 			return err
 		}
 
@@ -211,49 +145,23 @@ func (s *transactionService) Transfer(userID uuid.UUID, fromAccountID, toAccount
 	})
 }
 
+// GetTransactions retrieves transactions for a user by month and year.
 func (s *transactionService) GetTransactions(userID uuid.UUID, month, year int) ([]model.Transaction, error) {
 	return s.txRepo.FindByUserID(userID, month, year)
 }
 
+// UpdateTransaction updates an existing transaction and adjusts balances if the amount changes.
 func (s *transactionService) UpdateTransaction(userID uuid.UUID, txID uuid.UUID, amount decimal.Decimal, category, note string) error {
 	return s.db.Transaction(func(dbTx *gorm.DB) error {
-		tx, err := s.txRepo.FindByID(txID)
+		tx, err := s.getValidTransaction(txID, userID)
 		if err != nil {
-			return errors.New("transaction not found")
+			return err
 		}
 
-		if tx.UserID != userID {
-			return errors.New("unauthorized")
-		}
-
-		// Handle balance adjustments if amount changed
+		// Adjust balances if amount changed
 		if !amount.Equal(tx.Amount) {
 			diff := amount.Sub(tx.Amount)
-			
-			acc, err := s.accountRepo.FindByID(tx.AccountID)
-			if err != nil {
-				return errors.New("account not found")
-			}
-
-			if tx.Type == model.Income {
-				acc.Balance = acc.Balance.Add(diff)
-			} else if tx.Type == model.Expense {
-				acc.Balance = acc.Balance.Sub(diff)
-			} else if tx.Type == model.Transfer {
-				acc.Balance = acc.Balance.Sub(diff)
-				if tx.TargetAccountID != nil {
-					targetAcc, err := s.accountRepo.FindByID(*tx.TargetAccountID)
-					if err != nil {
-						return errors.New("target account not found")
-					}
-					targetAcc.Balance = targetAcc.Balance.Add(diff)
-					if err := s.accountRepo.Update(targetAcc); err != nil {
-						return err
-					}
-				}
-			}
-
-			if err := s.accountRepo.Update(acc); err != nil {
+			if err := s.adjustBalances(tx.AccountID, tx.TargetAccountID, tx.Type, diff); err != nil {
 				return err
 			}
 			tx.Amount = amount
@@ -266,45 +174,149 @@ func (s *transactionService) UpdateTransaction(userID uuid.UUID, txID uuid.UUID,
 	})
 }
 
+// DeleteTransaction removes a transaction and reverses its balance effects.
 func (s *transactionService) DeleteTransaction(userID uuid.UUID, txID uuid.UUID) error {
 	return s.db.Transaction(func(dbTx *gorm.DB) error {
-		tx, err := s.txRepo.FindByID(txID)
+		tx, err := s.getValidTransaction(txID, userID)
 		if err != nil {
-			return errors.New("transaction not found")
+			return err
 		}
 
-		if tx.UserID != userID {
-			return errors.New("unauthorized")
-		}
-
-		// Reverse balance effect
-		acc, err := s.accountRepo.FindByID(tx.AccountID)
-		if err != nil {
-			return errors.New("account not found")
-		}
-
-		if tx.Type == model.Income {
-			acc.Balance = acc.Balance.Sub(tx.Amount)
-		} else if tx.Type == model.Expense {
-			acc.Balance = acc.Balance.Add(tx.Amount)
-		} else if tx.Type == model.Transfer {
-			acc.Balance = acc.Balance.Add(tx.Amount)
-			if tx.TargetAccountID != nil {
-				targetAcc, err := s.accountRepo.FindByID(*tx.TargetAccountID)
-				if err != nil {
-					return errors.New("target account not found")
-				}
-				targetAcc.Balance = targetAcc.Balance.Sub(tx.Amount)
-				if err := s.accountRepo.Update(targetAcc); err != nil {
-					return err
-				}
-			}
-		}
-
-		if err := s.accountRepo.Update(acc); err != nil {
+		// Reverse the transaction's effect by applying the negative amount
+		reversalAmount := tx.Amount.Neg()
+		if err := s.adjustBalances(tx.AccountID, tx.TargetAccountID, tx.Type, reversalAmount); err != nil {
 			return err
 		}
 
 		return s.txRepo.Delete(txID)
 	})
+}
+
+// BulkAddTransactions processes an array of transactions in a single batch, aggregating balance changes.
+func (s *transactionService) BulkAddTransactions(userID uuid.UUID, transactions []model.Transaction) error {
+	return s.db.Transaction(func(dbTx *gorm.DB) error {
+		balanceAdjustments := make(map[uuid.UUID]decimal.Decimal)
+		var txRecords []model.Transaction
+
+		for _, tx := range transactions {
+			if tx.UserID != userID && tx.UserID != uuid.Nil {
+				return ErrUnauthorized
+			}
+
+			txRecord := tx
+			txRecord.UserID = userID
+			if txRecord.ID == uuid.Nil {
+				txRecord.ID = uuid.New()
+			}
+
+			switch tx.Type {
+			case model.Income:
+				if tx.AccountID == uuid.Nil {
+					return ErrMissingAccountID
+				}
+				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Add(tx.Amount)
+
+			case model.Expense:
+				if tx.AccountID == uuid.Nil {
+					return ErrMissingAccountID
+				}
+				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Sub(tx.Amount)
+
+			case model.Transfer:
+				if tx.AccountID == uuid.Nil || tx.TargetAccountID == nil || *tx.TargetAccountID == uuid.Nil {
+					return ErrMissingTargetAccountID
+				}
+				balanceAdjustments[tx.AccountID] = balanceAdjustments[tx.AccountID].Sub(tx.Amount)
+				balanceAdjustments[*tx.TargetAccountID] = balanceAdjustments[*tx.TargetAccountID].Add(tx.Amount)
+
+			default:
+				return ErrInvalidTransactionType
+			}
+
+			txRecords = append(txRecords, txRecord)
+		}
+
+		// Apply all accumulated balance adjustments
+		for accountID, adj := range balanceAdjustments {
+			if adj.IsZero() {
+				continue
+			}
+
+			acc, err := s.getValidAccount(accountID, userID)
+			if err != nil {
+				return err
+			}
+
+			acc.Balance = acc.Balance.Add(adj)
+			if err := s.accountRepo.Update(acc); err != nil {
+				return err
+			}
+		}
+
+		if len(txRecords) > 0 {
+			return s.txRepo.BulkCreate(txRecords)
+		}
+		return nil
+	})
+}
+
+// --- Internal Helper Methods ---
+
+// getValidAccount ensures an account exists and belongs to the given user.
+func (s *transactionService) getValidAccount(accountID, userID uuid.UUID) (*model.Account, error) {
+	acc, err := s.accountRepo.FindByID(accountID)
+	if err != nil {
+		return nil, ErrAccountNotFound
+	}
+	if acc.UserID != userID {
+		return nil, ErrUnauthorized
+	}
+	return acc, nil
+}
+
+// getValidTransaction ensures a transaction exists and belongs to the given user.
+func (s *transactionService) getValidTransaction(txID, userID uuid.UUID) (*model.Transaction, error) {
+	tx, err := s.txRepo.FindByID(txID)
+	if err != nil {
+		return nil, ErrTransactionNotFound
+	}
+	if tx.UserID != userID {
+		return nil, ErrUnauthorized
+	}
+	return tx, nil
+}
+
+// adjustBalances updates account balances based on transaction type and amount.
+// A positive amount represents the standard flow (e.g., creating a transaction).
+// A negative amount reverses the flow (e.g., deleting a transaction).
+func (s *transactionService) adjustBalances(accountID uuid.UUID, targetAccountID *uuid.UUID, txType model.TransactionType, amount decimal.Decimal) error {
+	acc, err := s.accountRepo.FindByID(accountID)
+	if err != nil {
+		return ErrAccountNotFound
+	}
+
+	switch txType {
+	case model.Income:
+		acc.Balance = acc.Balance.Add(amount)
+	case model.Expense, model.Transfer:
+		acc.Balance = acc.Balance.Sub(amount)
+	}
+
+	if err := s.accountRepo.Update(acc); err != nil {
+		return err
+	}
+
+	// Apply target account changes for transfers
+	if txType == model.Transfer && targetAccountID != nil {
+		targetAcc, err := s.accountRepo.FindByID(*targetAccountID)
+		if err != nil {
+			return ErrAccountNotFound
+		}
+		targetAcc.Balance = targetAcc.Balance.Add(amount)
+		if err := s.accountRepo.Update(targetAcc); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

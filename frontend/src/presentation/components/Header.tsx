@@ -11,7 +11,7 @@ export function Header() {
   const { setSidebarOpen } = useUIStore();
 
   return (
-    <header className="h-16 px-6 border-b border-border-color bg-card-bg flex items-center justify-between sticky top-0 z-30 shadow-sm">
+    <header className="h-16 px-6 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-md flex items-center justify-between sticky top-0 z-30 shadow-sm">
       <div className="flex items-center space-x-4">
         <button
           onClick={() => setSidebarOpen(true)}

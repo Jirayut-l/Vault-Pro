@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -25,14 +26,35 @@ func TestGetSummary_Success(t *testing.T) {
 
 	mockAccountRepo.On("FindByUserID", userID).Return(accounts, nil)
 
+	now := time.Now()
+	transactions := []model.Transaction{
+		{Type: model.Income, Amount: decimal.NewFromFloat(2000.00)},
+		{Type: model.Expense, Amount: decimal.NewFromFloat(500.00)},
+	}
+	mockTxRepo.On("FindByUserID", userID, int(now.Month()), now.Year()).Return(transactions, nil)
+
 	summary, err := dashboardService.GetSummary(userID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, summary)
 	assert.True(t, summary.TotalBalance.Equal(decimal.NewFromFloat(750.00)))
-	assert.True(t, summary.Jars[model.NEC].Equal(decimal.NewFromFloat(550.00)))
-	assert.True(t, summary.Jars[model.FFA].Equal(decimal.NewFromFloat(100.00)))
+	assert.True(t, summary.MonthlyIncome.Equal(decimal.NewFromFloat(2000.00)))
+	assert.True(t, summary.MonthlyExpenses.Equal(decimal.NewFromFloat(500.00)))
+	
+	assert.Equal(t, 3, len(summary.JarsSummary))
+	
+	// Assert NEC: (550 / 750) * 100 = 73.33333333333333
+	assert.Equal(t, model.NEC, summary.JarsSummary[0].Type)
+	assert.True(t, summary.JarsSummary[0].Balance.Equal(decimal.NewFromFloat(550.00)))
+	assert.InDelta(t, 73.33, summary.JarsSummary[0].Percentage, 0.01)
+
+	// Assert FFA: (100 / 750) * 100 = 13.333333333333334
+	assert.Equal(t, model.FFA, summary.JarsSummary[1].Type)
+	assert.True(t, summary.JarsSummary[1].Balance.Equal(decimal.NewFromFloat(100.00)))
+	assert.InDelta(t, 13.33, summary.JarsSummary[1].Percentage, 0.01)
+
 	mockAccountRepo.AssertExpectations(t)
+	mockTxRepo.AssertExpectations(t)
 }
 
 func TestGetExpensesByCategory_Success(t *testing.T) {

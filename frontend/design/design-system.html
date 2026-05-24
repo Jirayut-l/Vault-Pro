@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Foundation - FinPulse Dashboard</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style type="text/tailwindcss">
+    @variant dark (&:where(.dark, .dark *));
+  </style>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    /* Entrance Animations */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen antialiased transition-colors duration-300 flex flex-col">
+
+  <header class="h-20 border-b border-slate-200 dark:border-slate-800/60 flex items-center justify-between px-8 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 transition-colors duration-300">
+    <div class="flex items-center gap-6">
+      <a href="index.html" class="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-400 transition-colors bg-slate-100 dark:bg-slate-800/50 px-4 py-2 rounded-lg">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Dashboard
+      </a>
+      <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 hidden md:block">
+        FinPulse Design Foundation
+      </h1>
+    </div>
+    <div class="flex items-center gap-4">
+      <button id="themeToggle" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all border border-slate-200 dark:border-slate-700">
+        <svg id="sunIcon" class="hidden dark:block w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="moonIcon" class="block dark:hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-8 space-y-12 animate-slide-up">
+    
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">1. Color Tokens</h2>
+      
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Background & Surface</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 mb-2"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">App Background</p>
+              <p class="text-xs text-slate-500">bg-slate-50 / bg-slate-950</p>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-700 mb-2"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Card Surface (Glass)</p>
+              <p class="text-xs text-slate-500">bg-white/60 / bg-slate-900/40</p>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-slate-100 dark:bg-slate-800 mb-2"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Hover / Input</p>
+              <p class="text-xs text-slate-500">bg-slate-100 / bg-slate-800</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Accents & Gradients (Data Visualization & Branding)</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-cyan-500 mb-2 shadow-[0_0_15px_rgba(34,211,238,0.4)]"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Cyan (Primary/Crypto)</p>
+              <p class="text-xs text-slate-500">text-cyan-500</p>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-emerald-500 mb-2 shadow-[0_0_15px_rgba(16,185,129,0.4)]"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Emerald (Positive/Income)</p>
+              <p class="text-xs text-slate-500">text-emerald-500</p>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-fuchsia-500 mb-2 shadow-[0_0_15px_rgba(217,70,239,0.4)]"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Fuchsia (Spending/Alerts)</p>
+              <p class="text-xs text-slate-500">text-fuchsia-500</p>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-purple-500 mb-2 shadow-[0_0_15px_rgba(168,85,247,0.4)]"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Purple (Stocks/Brand)</p>
+              <p class="text-xs text-slate-500">text-purple-500</p>
+            </div>
+            <div class="col-span-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-gradient-to-r from-cyan-600 to-emerald-600 dark:from-cyan-400 dark:to-emerald-400 mb-2"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Money Gradient (Text & Bars)</p>
+              <p class="text-xs text-slate-500">from-cyan-400 to-emerald-400</p>
+            </div>
+            <div class="col-span-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+              <div class="h-12 rounded-lg bg-gradient-to-br from-purple-600 to-fuchsia-600 mb-2"></div>
+              <p class="font-medium text-sm text-slate-900 dark:text-white">Brand Gradient (Icons)</p>
+              <p class="text-xs text-slate-500">from-purple-600 to-fuchsia-600</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">2. Typography (Inter)</h2>
+      <div class="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-6">
+        
+        <div class="flex items-end gap-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div class="w-24 text-sm text-slate-500">Total Balance</div>
+          <div class="text-4xl font-bold text-slate-900 dark:text-white">text-4xl font-bold</div>
+        </div>
+        
+        <div class="flex items-end gap-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div class="w-24 text-sm text-slate-500">Section Title</div>
+          <div class="text-2xl font-semibold text-slate-900 dark:text-white">text-2xl font-semibold</div>
+        </div>
+
+        <div class="flex items-end gap-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div class="w-24 text-sm text-slate-500">Card Header</div>
+          <div class="text-lg font-semibold text-slate-900 dark:text-white">text-lg font-semibold</div>
+        </div>
+
+        <div class="flex items-end gap-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div class="w-24 text-sm text-slate-500">Body & List</div>
+          <div class="text-sm font-medium text-slate-900 dark:text-white">text-sm font-medium</div>
+        </div>
+
+        <div class="flex items-end gap-6">
+          <div class="w-24 text-sm text-slate-500">Meta / Label</div>
+          <div class="text-xs text-slate-500">text-xs text-slate-500</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">3. Components Foundation</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <div>
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Base Card Structure</h3>
+          <div class="rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+            <h4 class="text-sm font-medium text-slate-500 mb-2">Card Title</h4>
+            <p class="text-xl font-bold text-slate-900 dark:text-white mb-4">Content Area</p>
+            <p class="text-xs text-slate-500 font-mono">rounded-2xl p-6 backdrop-blur-xl border border-slate-200 dark:border-slate-800</p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Action Elements</h3>
+          <div class="space-y-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6">
+            
+            <div class="flex items-center gap-4">
+              <button class="bg-cyan-500 hover:bg-cyan-400 text-white p-2 rounded-lg transition-colors shadow-[0_0_10px_rgba(34,211,238,0.3)]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+              <span class="text-xs text-slate-500 font-mono">Primary Action (Quick Transfer)</span>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <button class="px-3 py-1 rounded-md text-xs font-medium bg-cyan-50 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30">
+                Active Filter
+              </button>
+              <span class="text-xs text-slate-500 font-mono">Active State (Chart Timeline)</span>
+            </div>
+
+            <div class="flex items-center gap-4">
+               <button class="px-3 py-1 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:text-white transition-colors">
+                Inactive
+              </button>
+              <span class="text-xs text-slate-500 font-mono">Inactive State</span>
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Transaction List Item</h3>
+          <div class="rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-4">
+            <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/20 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-slate-900 dark:text-white">Transaction Name</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-500">Date / Time</p>
+                </div>
+              </div>
+              <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">+$0.00</span>
+            </div>
+            <p class="text-xs text-slate-500 font-mono mt-2 px-3">Uses hover:bg-slate-100 / hover:bg-white/5 for interaction feedback.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+     <section>
+      <h2 class="text-2xl font-semibold mb-6 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">3. Spacings & Paddings</h2>
+      <p class="text-sm text-slate-500 mb-6">ระยะห่างที่ใช้เป็นมาตรฐานภายใน Dashboard เพื่อให้หน้าต่างดูเป็นระเบียบและอ่านง่าย</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Inner Paddings (p-*)</h3>
+          <div class="space-y-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6">
+            
+            <div class="flex items-center gap-4">
+              <div class="bg-cyan-500/20 border border-cyan-500 border-dashed rounded-lg p-2 inline-block">
+                <div class="bg-slate-200 dark:bg-slate-800 w-16 h-8 rounded"></div>
+              </div>
+              <div>
+                <p class="text-sm font-medium">p-2 (8px)</p>
+                <p class="text-xs text-slate-500">ใช้สำหรับปุ่มเล็กๆ หรือ Icon Button</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <div class="bg-cyan-500/20 border border-cyan-500 border-dashed rounded-xl p-4 inline-block">
+                <div class="bg-slate-200 dark:bg-slate-800 w-16 h-8 rounded"></div>
+              </div>
+              <div>
+                <p class="text-sm font-medium">p-4 (16px)</p>
+                <p class="text-xs text-slate-500">ใช้สำหรับ List Items (เช่น รายการโอนเงิน)</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <div class="bg-cyan-500/20 border border-cyan-500 border-dashed rounded-2xl p-6 inline-block">
+                <div class="bg-slate-200 dark:bg-slate-800 w-16 h-8 rounded"></div>
+              </div>
+              <div>
+                <p class="text-sm font-medium">p-6 (24px)</p>
+                <p class="text-xs text-slate-500">ระยะขอบมาตรฐานสำหรับ Card และ Widget ทั้งหมด</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <div class="bg-cyan-500/20 border border-cyan-500 border-dashed rounded-2xl p-8 inline-block">
+                <div class="bg-slate-200 dark:bg-slate-800 w-16 h-8 rounded"></div>
+              </div>
+              <div>
+                <p class="text-sm font-medium">p-8 (32px)</p>
+                <p class="text-xs text-slate-500">ระยะขอบของหน้าจอหลัก (Main Content Area)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Layout Gaps (gap-*)</h3>
+          <div class="space-y-6 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6">
+            
+            <div>
+              <div class="flex gap-3 mb-2">
+                <div class="w-8 h-8 rounded bg-slate-200 dark:bg-slate-800"></div>
+                <div class="w-8 h-8 rounded bg-slate-200 dark:bg-slate-800"></div>
+                <div class="w-8 h-8 rounded bg-slate-200 dark:bg-slate-800"></div>
+              </div>
+              <p class="text-sm font-medium">gap-3 (12px)</p>
+              <p class="text-xs text-slate-500">ระยะห่างระหว่าง Icon กับ Text หรือกลุ่ม Avatar</p>
+            </div>
+
+            <div>
+              <div class="flex gap-6 mb-2">
+                <div class="w-16 h-12 rounded bg-slate-200 dark:bg-slate-800"></div>
+                <div class="w-16 h-12 rounded bg-slate-200 dark:bg-slate-800"></div>
+              </div>
+              <p class="text-sm font-medium">gap-6 (24px)</p>
+              <p class="text-xs text-slate-500">ระยะห่างมาตรฐานระหว่าง Card ในระบบ Grid</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">4. Layout Grid</h2>
+      <p class="text-sm text-slate-500 mb-6">โครงสร้าง Grid หลักที่ใช้จัดการ Component ในหน้า Dashboard ให้ตอบสนองได้ทุกขนาดหน้าจอ (Responsive)</p>
+      
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-2">Summary Cards Grid <span class="text-xs text-slate-500 font-mono ml-2">grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6</span></h3>
+          <div class="grid grid-cols-4 gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
+            <div class="h-16 rounded border border-dashed border-cyan-500/50 bg-cyan-500/10 flex items-center justify-center text-xs text-cyan-600 dark:text-cyan-400">Card 1</div>
+            <div class="h-16 rounded border border-dashed border-cyan-500/50 bg-cyan-500/10 flex items-center justify-center text-xs text-cyan-600 dark:text-cyan-400">Card 2</div>
+            <div class="h-16 rounded border border-dashed border-cyan-500/50 bg-cyan-500/10 flex items-center justify-center text-xs text-cyan-600 dark:text-cyan-400">Card 3</div>
+            <div class="h-16 rounded border border-dashed border-cyan-500/50 bg-cyan-500/10 flex items-center justify-center text-xs text-cyan-600 dark:text-cyan-400">Card 4</div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-2">Main Content Grid <span class="text-xs text-slate-500 font-mono ml-2">grid-cols-1 lg:grid-cols-3 gap-6</span></h3>
+          <div class="grid grid-cols-3 gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
+            <div class="col-span-2 h-24 rounded border border-dashed border-purple-500/50 bg-purple-500/10 flex items-center justify-center text-xs text-purple-600 dark:text-purple-400">
+              lg:col-span-2 (Chart Area)
+            </div>
+            <div class="col-span-1 h-24 rounded border border-dashed border-emerald-500/50 bg-emerald-500/10 flex items-center justify-center text-xs text-emerald-600 dark:text-emerald-400">
+              lg:col-span-1 (Side Widget)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2">5. Elevation (Shadows & Depth)</h2>
+      <p class="text-sm text-slate-500 mb-6">การสร้างมิติใน Dashboard ใช้เทคนิค Glassmorphism ควบคู่กับ Glow Shadow แบบ High-tech</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="flex flex-col items-center p-6 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+          <div class="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-800 mb-4 border border-slate-200 dark:border-slate-700"></div>
+          <h3 class="font-medium text-sm text-center">Base Surface (Glass)</h3>
+          <p class="text-xs text-slate-500 text-center mt-2 font-mono">backdrop-blur-xl <br> bg-slate-900/40</p>
+        </div>
+
+        <div class="flex flex-col items-center p-6 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800">
+          <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-fuchsia-600 mb-4 shadow-[0_0_15px_rgba(168,85,247,0.4)]"></div>
+          <h3 class="font-medium text-sm text-center">Glow Element</h3>
+          <p class="text-xs text-slate-500 text-center mt-2 font-mono">shadow-[0_0_15px_<br>rgba(168,85,247,0.4)]</p>
+          <p class="text-[10px] text-slate-400 text-center mt-1">ใช้เน้น Icon หรือจุดน่าสนใจ</p>
+        </div>
+
+        <div class="flex flex-col items-center p-6 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 hover:-translate-y-2 hover:border-cyan-400 dark:hover:border-cyan-500/30 hover:shadow-[0_10px_30px_-10px_rgba(34,211,238,0.2)] transition-all duration-300 cursor-pointer">
+          <div class="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-800 mb-4 flex items-center justify-center text-cyan-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+          </div>
+          <h3 class="font-medium text-sm text-center">Hover Interaction</h3>
+          <p class="text-xs text-slate-500 text-center mt-2 font-mono">hover:-translate-y-1<br>hover:shadow-[...]</p>
+          <p class="text-[10px] text-slate-400 text-center mt-1">(ลองเอาเมาส์ชี้ดูครับ)</p>
+        </div>
+
+      </div>
+    </section>
+
+
+  </main>
+
+  <script>
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      htmlElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      htmlElement.classList.remove('dark');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      htmlElement.classList.toggle('dark');
+      localStorage.setItem('theme', htmlElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

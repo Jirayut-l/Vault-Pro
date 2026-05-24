@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High-Tech Financial Dashboard - Full Index</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style type="text/tailwindcss">
+    @theme { }
+    @variant dark (&:where(.dark, .dark *));
+  </style>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Entrance Animations */
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .delay-100 {
+      animation-delay: 100ms;
+    }
+
+    .delay-200 {
+      animation-delay: 200ms;
+    }
+
+    .delay-300 {
+      animation-delay: 300ms;
+    }
+
+    .delay-400 {
+      animation-delay: 400ms;
+    }
+
+    .delay-500 {
+      animation-delay: 500ms;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+
+    /* SVG Donut Chart Animation */
+    .donut-segment {
+      animation: drawDonut 1.5s ease-out forwards;
+      stroke-dashoffset: 100;
+    }
+
+    @keyframes drawDonut {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  </style>
+</head>
+
+<body
+  class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen flex antialiased selection:bg-cyan-500/30 transition-colors duration-300">
+
+  <aside
+    class="hidden lg:flex flex-col w-64 border-r border-slate-200 dark:border-slate-800/60 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl p-6 relative z-10 transition-colors duration-300">
+    <div class="flex items-center gap-3 mb-12">
+      <div
+        class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      </div>
+      <span
+        class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">FinPulse</span>
+    </div>
+
+    <nav class="flex-1 space-y-2">
+      <a href="#"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-50 dark:bg-white/5 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.1)] transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+          </path>
+        </svg>
+        <span class="font-medium">Dashboard</span>
+      </a>
+      <a href="#"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+          </path>
+        </svg>
+        <span class="font-medium">Analytics</span>
+      </a>
+      <a href="#"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+        </svg>
+        <span class="font-medium">Cards & Accounts</span>
+      </a>
+      <a href="#"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        <span class="font-medium">Scheduled</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <header
+      class="h-20 border-b border-slate-200 dark:border-slate-800/60 flex items-center justify-between px-8 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md z-10 transition-colors duration-300">
+      <div class="flex flex-col">
+        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Dashboard Index</h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Here's what's happening with your money today.</p>
+      </div>
+      <div class="flex items-center gap-6">
+        <button id="themeToggle"
+          class="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all border border-slate-200 dark:border-slate-700">
+          <svg id="sunIcon" class="hidden dark:block w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+            </path>
+          </svg>
+          <svg id="moonIcon" class="block dark:hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+        <button
+          class="relative text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+            </path>
+          </svg>
+          <span
+            class="absolute top-0 right-0 w-2.5 h-2.5 bg-fuchsia-500 rounded-full border-2 border-white dark:border-slate-950 animate-pulse"></span>
+        </button>
+        <div class="flex items-center gap-3 cursor-pointer">
+          <img src="https://ui-avatars.com/api/?name=Tum&background=0D8B93&color=fff" alt="User"
+            class="w-10 h-10 rounded-full border border-slate-300 dark:border-slate-700 hover:border-cyan-500 dark:hover:border-cyan-400 transition-colors">
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8 space-y-6 relative">
+      <div
+        class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-[120px] -z-10 pointer-events-none">
+      </div>
+      <div
+        class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-[100px] -z-10 pointer-events-none">
+      </div>
+
+      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div
+          class="group animate-slide-up rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 hover:border-cyan-400 dark:hover:border-cyan-500/30 transition-all duration-300">
+          <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Total Balance</h3>
+          <div
+            class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-emerald-600 dark:from-cyan-400 dark:to-emerald-400 mb-2">
+            $124,562.00</div>
+          <div class="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+              </path>
+            </svg>
+            <span>+12.5% this month</span>
+          </div>
+        </div>
+        <div
+          class="group animate-slide-up delay-100 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 hover:border-purple-400 dark:hover:border-purple-500/30 transition-all duration-300">
+          <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Monthly Income</h3>
+          <div class="text-3xl font-bold text-slate-900 dark:text-white mb-2">$18,240.50</div>
+          <div class="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+              </path>
+            </svg>
+            <span>+4.2% vs last month</span>
+          </div>
+        </div>
+        <div
+          class="group animate-slide-up delay-200 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 hover:border-fuchsia-400 dark:hover:border-fuchsia-500/30 transition-all duration-300">
+          <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Spending</h3>
+          <div class="text-3xl font-bold text-slate-900 dark:text-white mb-2">$5,320.00</div>
+          <div class="flex items-center gap-2 text-sm text-fuchsia-600 dark:text-fuchsia-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
+            </svg>
+            <span>-2.1% vs last month</span>
+          </div>
+        </div>
+        <div
+          class="group animate-slide-up delay-300 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 hover:border-blue-400 dark:hover:border-blue-500/30 transition-all duration-300">
+          <h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Total Savings</h3>
+          <div class="text-3xl font-bold text-slate-900 dark:text-white mb-2">$42,100.00</div>
+          <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mt-4">
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full" style="width: 65%"></div>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-500 mt-2">65% of yearly goal</p>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+          class="animate-slide-up delay-200 lg:col-span-2 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col h-[400px]">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Cash Flow Analytics</h2>
+            <div class="flex gap-2">
+              <button
+                class="px-3 py-1 rounded-md text-xs font-medium bg-cyan-50 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30">1M</button>
+              <button
+                class="px-3 py-1 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:text-white transition-colors">1Y</button>
+            </div>
+          </div>
+
+          <div
+            class="flex-1 relative w-full border-b border-l border-slate-200 dark:border-slate-800 flex items-end px-2 pb-2">
+            <div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-40 dark:opacity-20">
+              <div class="w-full h-[1px] bg-slate-300 dark:bg-slate-700"></div>
+              <div class="w-full h-[1px] bg-slate-300 dark:bg-slate-700"></div>
+              <div class="w-full h-[1px] bg-slate-300 dark:bg-slate-700"></div>
+              <div class="w-full h-[1px] bg-slate-300 dark:bg-slate-700"></div>
+            </div>
+            <div class="absolute bottom-2 left-2 right-2 h-3/4 flex items-end">
+              <svg viewBox="0 0 100 50" class="w-full h-full overflow-visible" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="chartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(34,211,238,0.3)" />
+                    <stop offset="100%" stop-color="rgba(34,211,238,0)" />
+                  </linearGradient>
+                  <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#a855f7" />
+                    <stop offset="50%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#10b981" />
+                  </linearGradient>
+                </defs>
+                <path d="M0,40 Q10,35 20,40 T40,25 T60,30 T80,10 T100,5 L100,50 L0,50 Z" fill="url(#chartGrad)" />
+                <path d="M0,40 Q10,35 20,40 T40,25 T60,30 T80,10 T100,5" fill="none" stroke="url(#lineGrad)"
+                  stroke-width="1.5" class="drop-shadow-[0_0_6px_rgba(6,182,212,0.6)]" />
+                <circle cx="80" cy="10" r="1.5" fill="#fff" class="drop-shadow-[0_0_4px_#10b981] animate-pulse" />
+                <circle cx="100" cy="5" r="1.5" fill="#fff" class="drop-shadow-[0_0_4px_#10b981]" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-1 flex flex-col gap-6 h-[400px]">
+          <div
+            class="animate-slide-up delay-300 relative rounded-2xl p-6 overflow-hidden bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-950 text-slate-900 dark:text-white shadow-xl dark:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 flex-1 transition-colors duration-300">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 dark:bg-cyan-500/20 rounded-full blur-2xl">
+            </div>
+            <div
+              class="absolute -left-10 -bottom-10 w-40 h-40 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-2xl">
+            </div>
+
+            <div class="relative z-10 flex justify-between items-center mb-6">
+              <span
+                class="font-bold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">FinPulse</span>
+              <svg class="w-8 h-8 text-slate-400 dark:text-slate-400 opacity-80" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+              </svg>
+            </div>
+
+            <div class="relative z-10 text-xl font-mono mb-6 tracking-[0.2em] text-slate-600 dark:text-slate-200">****
+              **** **** 4289</div>
+
+            <div class="relative z-10 flex justify-between text-sm mt-auto">
+              <div>
+                <span class="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Card Holder</span><br>
+                <span class="font-medium text-slate-900 dark:text-white">TUM</span>
+              </div>
+              <div class="text-right">
+                <span class="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">Expires</span><br>
+                <span class="font-medium text-slate-900 dark:text-white">12/28</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="animate-slide-up delay-400 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-5 flex-1 flex flex-col justify-between">
+            <h2 class="text-sm font-semibold text-slate-900 dark:text-white mb-3">Quick Transfer</h2>
+            <div class="flex gap-3 mb-4">
+              <div
+                class="w-10 h-10 rounded-full border border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-cyan-500 hover:border-cyan-500 cursor-pointer transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg></div>
+              <img src="https://ui-avatars.com/api/?name=Jane&background=A855F7&color=fff"
+                class="w-10 h-10 rounded-full cursor-pointer hover:ring-2 ring-purple-500 transition-all">
+              <img src="https://ui-avatars.com/api/?name=Bob&background=10B981&color=fff"
+                class="w-10 h-10 rounded-full cursor-pointer hover:ring-2 ring-emerald-500 transition-all">
+              <img src="https://ui-avatars.com/api/?name=Alice&background=3B82F6&color=fff"
+                class="w-10 h-10 rounded-full cursor-pointer hover:ring-2 ring-blue-500 transition-all">
+            </div>
+            <div class="flex gap-2">
+              <input type="text" placeholder="$ 0.00"
+                class="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500 transition-colors">
+              <button
+                class="bg-cyan-500 hover:bg-cyan-400 text-white p-2 rounded-lg transition-colors shadow-[0_0_10px_rgba(34,211,238,0.3)]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                  </path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div
+          class="animate-slide-up delay-300 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col h-[350px]">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Asset Allocation</h2>
+          <div class="flex-1 flex items-center justify-center relative">
+            <svg viewBox="0 0 36 36" class="w-40 h-40 drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+              <path class="text-slate-200 dark:text-slate-800"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                stroke="currentColor" stroke-width="3.5" />
+              <path class="text-cyan-500 donut-segment" stroke-dasharray="40, 100"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                stroke="currentColor" stroke-width="3.5" />
+              <path class="text-purple-500 donut-segment" stroke-dasharray="35, 100" stroke-dashoffset="-40"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                stroke="currentColor" stroke-width="3.5" />
+              <path class="text-emerald-500 donut-segment" stroke-dasharray="25, 100" stroke-dashoffset="-75"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
+                stroke="currentColor" stroke-width="3.5" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-2xl font-bold text-slate-900 dark:text-white">3</span>
+              <span class="text-[10px] text-slate-500">Assets</span>
+            </div>
+          </div>
+          <div class="flex justify-between mt-4 text-xs">
+            <div class="flex items-center gap-1 text-cyan-600 dark:text-cyan-400"><span
+                class="w-2 h-2 rounded-full bg-cyan-500"></span> Crypto</div>
+            <div class="flex items-center gap-1 text-purple-600 dark:text-purple-400"><span
+                class="w-2 h-2 rounded-full bg-purple-500"></span> Stocks</div>
+            <div class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400"><span
+                class="w-2 h-2 rounded-full bg-emerald-500"></span> Bonds</div>
+          </div>
+        </div>
+
+        <div
+          class="animate-slide-up delay-400 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col h-[350px]">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Recent Activity</h2>
+            <a href="#" class="text-sm text-cyan-600 dark:text-cyan-400 hover:underline">View All</a>
+          </div>
+          <div class="flex-1 overflow-y-auto pr-2 space-y-3">
+            <div
+              class="flex items-center justify-between p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                  </svg></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-900 dark:text-white">Upwork</p>
+                  <p class="text-[10px] text-slate-500">Today</p>
+                </div>
+              </div>
+              <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">+$1,200.00</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-lg bg-fuchsia-100 dark:bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
+                    </path>
+                  </svg></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-900 dark:text-white">AWS Service</p>
+                  <p class="text-[10px] text-slate-500">Yesterday</p>
+                </div>
+              </div>
+              <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">-$65.00</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg></div>
+                <div>
+                  <p class="text-sm font-medium text-slate-900 dark:text-white">Spotify</p>
+                  <p class="text-[10px] text-slate-500">May 21</p>
+                </div>
+              </div>
+              <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">-$9.99</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="animate-slide-up delay-500 rounded-2xl bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col h-[350px]">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Upcoming Bills</h2>
+          </div>
+          <div class="flex-1 overflow-y-auto pr-2 space-y-3">
+            <div
+              class="flex items-center justify-between p-3 rounded-xl border border-rose-200 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-950/10">
+              <div>
+                <p class="text-sm font-medium text-slate-900 dark:text-white">Internet Bill</p>
+                <p class="text-xs text-rose-500 dark:text-rose-400 font-medium">Due in 2 days</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-slate-900 dark:text-white">$45.00</span>
+                <button
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90 transition-opacity">Pay</button>
+              </div>
+            </div>
+            <div
+              class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+              <div>
+                <p class="text-sm font-medium text-slate-900 dark:text-white">Car Insurance</p>
+                <p class="text-xs text-slate-500">Due in 12 days</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-slate-900 dark:text-white">$120.00</span>
+                <button
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Pay</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      htmlElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      htmlElement.classList.remove('dark');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      htmlElement.classList.toggle('dark');
+      localStorage.setItem('theme', htmlElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+
+</html>

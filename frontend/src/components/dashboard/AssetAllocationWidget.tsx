@@ -12,7 +12,6 @@ export default function AssetAllocationWidget() {
   const tooltipBg = isDark ? '#020617e6' : '#ffffffeb';
   const tooltipBorder = isDark ? '#1e293b' : '#e2e8f0';
   const tooltipText = isDark ? '#f8fafc' : '#0f172a';
-  const textColor = isDark ? '#94a3b8' : '#64748b';
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -62,7 +61,7 @@ export default function AssetAllocationWidget() {
       </div>
       <div className="flex flex-wrap justify-between mt-4 text-xs">
         {portfolioAllocation.map((item) => (
-          <div key={item.name} className="flex items-center gap-1" style={{ color: textColor }}>
+          <div key={item.name} className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></span> 
             {item.name}
           </div>

@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "High-Tech Financial Dashboard",
 };
 
+import { TransactionFAB } from "@/components/transactions/TransactionFAB";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
+          <TransactionFAB />
         </ThemeProvider>
       </body>
     </html>

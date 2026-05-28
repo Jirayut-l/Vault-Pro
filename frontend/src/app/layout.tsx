@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vault Pro - FinPulse",
+  title: "Vault Pro",
   description: "High-Tech Financial Dashboard",
 };
 

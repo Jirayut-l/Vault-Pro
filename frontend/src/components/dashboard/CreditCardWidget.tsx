@@ -10,7 +10,7 @@ export default function CreditCardWidget() {
 
       <div className="relative z-10 flex justify-between items-center mb-6">
         <span className="font-bold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
-          FinPulse
+          Vault Pro
         </span>
         <Hexagon className="w-8 h-8 text-slate-400 dark:text-slate-400 opacity-80" />
       </div>

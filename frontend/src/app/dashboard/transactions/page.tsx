@@ -87,31 +87,19 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 relative h-full animate-fade-in z-0">
-      {/* Background ambient glows matching dashboard */}
-      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-      <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-
+    <div className="animate-fade-in z-0 space-y-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800/60 pb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight uppercase">Transaction Ledger</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Manage and view your financial activity across all Jars.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-              Export CSV
-            </button>
-            <button 
-              onClick={handleOpenCreate}
-              className="inline-flex items-center justify-center rounded-lg bg-cyan-600/90 dark:bg-cyan-500/90 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500 dark:hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] transition-all border border-cyan-400/30"
-            >
-              + New Transaction
-            </button>
-          </div>
-        </header>
+        <div className="flex items-center justify-end gap-3 border-b border-slate-200 dark:border-slate-800/60 pb-6">
+          <button className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            Export CSV
+          </button>
+          <button 
+            onClick={handleOpenCreate}
+            className="inline-flex items-center justify-center rounded-lg bg-cyan-600/90 dark:bg-cyan-500/90 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-500 dark:hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] transition-all border border-cyan-400/30"
+          >
+            + New Transaction
+          </button>
+        </div>
         
         <TransactionFilters />
         
